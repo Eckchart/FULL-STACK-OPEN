@@ -1,7 +1,10 @@
 import { useState } from 'react'
 
 const StatisticLine = (props) => (
-    <p>{props.text} {props.value}</p>
+    <tr>
+        <td>{props.text}</td>
+        <td>{props.value}</td>
+    </tr>
 )
 
 const Statistics = (props) => {
@@ -15,19 +18,21 @@ const Statistics = (props) => {
             {totalFeedback === 0 ? (
                 <p>No feedback given</p>
             ) : (
-                <>
-                    <StatisticLine text="good" value={props.good} />
-                    <StatisticLine text="neutral" value={props.neutral} />
-                    <StatisticLine text="bad" value={props.bad} />
-                    <StatisticLine text="all" value={totalFeedback} />
-                    <StatisticLine text="average" value={avgScore} />
-                    <StatisticLine text="positive" value={positiveFeedbackPercentage} />
-                </>
+                <table>
+                    <tbody>
+                        <StatisticLine text="good" value={props.good} />
+                        <StatisticLine text="neutral" value={props.neutral} />
+                        <StatisticLine text="bad" value={props.bad} />
+                        <StatisticLine text="all" value={totalFeedback} />
+                        <StatisticLine text="average" value={avgScore} />
+                        <StatisticLine text="positive" value={positiveFeedbackPercentage} />
+                    </tbody>
+                </table>
             )}
         </div>
     )
 }
-
+    
 const Button = (props) => (
     <button onClick={props.onClick}>{props.text}</button>
 )
