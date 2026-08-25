@@ -4,8 +4,6 @@ const Person = (props) => (
 
 const Persons = (props) => {
   const { persons } = props
-  console.log("Q:", persons);
-  
 
   return (
     <div>
