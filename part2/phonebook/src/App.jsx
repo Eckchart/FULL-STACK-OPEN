@@ -10,7 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterText, setFilterText] = useState('')
-  const [successfulMessage, setSuccessfulMessage] = useState(null)
+  const [notifMessage, setNotifMessage] = useState(null)
+  const [messageType, setMessageType] = useState(null)
 
   useEffect(() => {
     personService
@@ -41,19 +42,16 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
-        setSuccessfulMessage(`Added ${returnedPerson.name}`)
+        setNotifMessage(`Added ${returnedPerson.name}`)
         setTimeout(() => {
-          setSuccessfulMessage(null)
+          setNotifMessage(null)
         }, 5000)
+        setMessageType('success')
       })
   }
 
   const deletePerson = (id) => {
     const personToDelete = persons.find(p => p.id === id)
-    if (!personToDelete) {
-      alert("That person doesn't exist.")
-      return
-    }
     if (!window.confirm(`Delete ${personToDelete.name}?`)) {
       return
     }
@@ -62,7 +60,16 @@ const App = () => {
       .destroy(id)
       .then(deletedPerson => {
         setPersons(persons.filter(p => p.id !== deletedPerson.id))
-      });
+      })
+      .catch(error => {
+        setPersons(persons.filter(p => p.id !== id))
+        setNotifMessage(`Information of ${personToDelete.name} has ` +
+          `already been removed from the server`)
+        setTimeout(() => {
+          setNotifMessage(null)
+        }, 5000)
+        setMessageType('error')
+      })
   }
 
   const updatePerson = (id) => {
@@ -76,10 +83,20 @@ const App = () => {
         setPersons(persons.map(p => p.id === updatedPerson.id ? updatedPerson : p))
         setNewName('')
         setNewNumber('')
-        setSuccessfulMessage(`Updated ${updatedPerson.name}'s number to ${updatedPerson.number}`)
+        setNotifMessage(`Updated ${updatedPerson.name}'s number to ${updatedPerson.number}`)
         setTimeout(() => {
-          setSuccessfulMessage(null)
+          setNotifMessage(null)
         }, 5000)
+        setMessageType('success')
+      })
+      .catch(error => {
+        setPersons(persons.filter(p => p.id !== id))
+        setNotifMessage(`Information of ${changedPerson.name} has ` +
+          `already been removed from the server`)
+        setTimeout(() => {
+          setNotifMessage(null)
+        }, 5000)
+        setMessageType('error')
       })
   }
 
@@ -104,7 +121,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={successfulMessage} />
+      <Notification message={notifMessage} messageType={messageType} />
       <Filter filterText={filterText} onChange={handleFilterTextChange} />
 
       <h3>Add a new</h3>
