@@ -5,7 +5,7 @@ import Notification from "./components/Notification"
 import Footer from "./components/Footer"
 
 const App = () => {
-  const [notes, setNotes] = useState([])
+  const [notes, setNotes] = useState(null)
   const [newNote, setNewNote] = useState('a new note...')
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState('some error happened...')
@@ -20,6 +20,11 @@ const App = () => {
       })
   }, [])
 
+  // do not render anything if 'notes' is still null
+  if (!notes) {
+    return null
+  }
+  
   console.log('render', notes.length, 'notes');
 
   const addNote = (event) => {
