@@ -2,13 +2,33 @@
   "persons": [
     {
       "name": "Ada Lovelace",
-      "number": "39-44-5323523",
+      "number": "13",
       "id": "2"
     },
     {
       "name": "Dan Abramov",
       "number": "12-43-234345",
       "id": "3"
+    },
+    {
+      "name": "abc",
+      "number": "7",
+      "id": "6Mmfuy2l7jg"
+    },
+    {
+      "name": "abd",
+      "number": "0784315546",
+      "id": "EbXwO1gp4qY"
+    },
+    {
+      "name": "ada lovelace",
+      "number": "wtf",
+      "id": "cw68jcB41fQ"
+    },
+    {
+      "name": "",
+      "number": "8",
+      "id": "bopz8EEWBbU"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

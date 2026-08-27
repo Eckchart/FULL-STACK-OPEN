@@ -13,6 +13,7 @@ const create = (newObject) => {
 }
 
 const update = (id, newObject) => {
+  // it returns the updated person object from the server
   return axios.put(`${baseUrl}/${id}`, newObject).then(response => response.data)
 }
 
