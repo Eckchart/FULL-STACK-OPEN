@@ -2,7 +2,7 @@
   "persons": [
     {
       "name": "Ada Lovelace",
-      "number": "13",
+      "number": "111",
       "id": "2"
     },
     {
@@ -12,7 +12,7 @@
     },
     {
       "name": "abc",
-      "number": "7",
+      "number": "def",
       "id": "6Mmfuy2l7jg"
     },
     {
@@ -22,13 +22,23 @@
     },
     {
       "name": "ada lovelace",
-      "number": "wtf",
+      "number": "123",
       "id": "cw68jcB41fQ"
     },
     {
       "name": "",
       "number": "8",
       "id": "bopz8EEWBbU"
+    },
+    {
+      "name": "123",
+      "number": "345",
+      "id": "SzIxBxaJbcQ"
+    },
+    {
+      "name": "arf",
+      "number": "134",
+      "id": "-EtXLNoKqqk"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
