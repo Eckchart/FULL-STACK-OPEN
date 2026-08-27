@@ -39,6 +39,25 @@ const App = () => {
       })
   }
 
+  const deletePerson = (id) => {
+    const personToDelete = persons.find(p => p.id === id)
+    if (!personToDelete)
+    {
+      alert("That person doesn't exist.")
+      return
+    }
+    if (!window.confirm(`Delete ${personToDelete.name}?`))
+    {
+      return
+    }
+
+    personService
+      .destroy(id)
+      .then(deletedPerson => {
+        setPersons(persons.filter(p => p.id !== deletedPerson.id))
+      });
+  }
+
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -69,7 +88,7 @@ const App = () => {
       />
       
       <h3>Numbers</h3>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} deletePerson={deletePerson} />
     </div>
   )
 }
