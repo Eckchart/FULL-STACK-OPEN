@@ -1,51 +1,38 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import Countries from './components/Countries'
+import CountryInfo from './components/CountryInfo'
 
 const App = () => {
   const [allCountries, setAllCountries] = useState(null)
   const [countriesFilterText, setCountriesFilterText] = useState('')
+  const [selectedCountryFlag, setSelectedCountryFlag] = useState(null)
 
   useEffect(() => {
     axios
       .get('https://studies.cs.helsinki.fi/restcountries/api/all')
       .then(response => setAllCountries(response.data))
   }, [])
-  if (!allCountries)
-  {
-    return null
+  if (!allCountries) {
+    return (
+      <div>
+        Loading...
+      </div>
+    )
   }
   
   const handleCountriesFilterChange = (event) => {
     setCountriesFilterText(event.target.value)
+    setSelectedCountryFlag(null)
+  }
+
+  const handleShowClick = (countryFlag) => {
+    setSelectedCountryFlag(countryFlag)
   }
   
   const filteredCountries = allCountries.filter(c => (
     c.name.common.toLowerCase().includes(countriesFilterText.toLowerCase())
   ))
-
-  if (filteredCountries.length === 1) {
-    const country = filteredCountries[0]
-    
-    return (
-      <div>
-        find countries <input value={countriesFilterText} onChange={handleCountriesFilterChange} />
-        <div>
-          <h2>{country.name.common}</h2>
-          <p>Capital {country.capital}</p>
-          <p>Area {country.area}</p>
-
-          <h2>Languages</h2>
-          <ul>
-            {Object.entries(country.languages).map(([abbrv, lang]) =>
-              <li key={abbrv}>{lang}</li>
-            )}
-          </ul>
-          <img src={country.flags.png} alt={country.flags.alt} width="200" height="150" />
-        </div>
-      </div>
-    )
-  }
-  
   if (filteredCountries.length > 10) {
     return (
       <div>
@@ -55,15 +42,30 @@ const App = () => {
     )
   }
 
-  // 1 < filteredCountries.length < 10
+  let country = null
+  if (selectedCountryFlag) {
+    country = allCountries.find(c => c.flag === selectedCountryFlag)
+  }
+  else if (filteredCountries.length === 1) {
+    country = filteredCountries[0]
+  }
+    
   return (
     <div>
       find countries <input value={countriesFilterText} onChange={handleCountriesFilterChange} />
-      <div>
-        {filteredCountries.map(country =>
-          <p key={country.flag}>{country.name.common}</p>
-        )}
-      </div>
+      {country
+        ?
+        <CountryInfo
+          commonName={country.name.common}
+          capital={country.capital}
+          area={country.area}
+          languages={country.languages}
+          flags={country.flags}
+        />
+        : 
+        // 0 U 1 < filteredCountries.length < 10
+        <Countries countries={filteredCountries} handleShowClick={handleShowClick} />
+      }
     </div>
   )
 }
