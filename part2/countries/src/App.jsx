@@ -1,122 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [allCountries, setAllCountries] = useState(null)
+  const [countriesFilterText, setCountriesFilterText] = useState('')
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+  useEffect(() => {
+    axios
+      .get('https://studies.cs.helsinki.fi/restcountries/api/all')
+      .then(response => setAllCountries(response.data))
+  }, [])
+  if (!allCountries)
+  {
+    return null
+  }
+  
+  const handleCountriesFilterChange = (event) => {
+    setCountriesFilterText(event.target.value)
+  }
+  
+  const filteredCountries = allCountries.filter(c => (
+    c.name.common.toLowerCase().includes(countriesFilterText.toLowerCase())
+  ))
+
+  if (filteredCountries.length === 1) {
+    const country = filteredCountries[0]
+    
+    return (
+      <div>
+        find countries <input value={countriesFilterText} onChange={handleCountriesFilterChange} />
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+          <h2>{country.name.common}</h2>
+          <p>Capital {country.capital}</p>
+          <p>Area {country.area}</p>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
+          <h2>Languages</h2>
           <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
+            {Object.entries(country.languages).map(([abbrv, lang]) =>
+              <li key={abbrv}>{lang}</li>
+            )}
           </ul>
+          <img src={country.flags.png} alt={country.flags.alt} width="200" height="150" />
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      </div>
+    )
+  }
+  
+  if (filteredCountries.length > 10) {
+    return (
+      <div>
+        find countries <input value={countriesFilterText} onChange={handleCountriesFilterChange} />
+        <p>Too many matches, specify another filter</p>
+      </div>
+    )
+  }
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+  // 1 < filteredCountries.length < 10
+  return (
+    <div>
+      find countries <input value={countriesFilterText} onChange={handleCountriesFilterChange} />
+      <div>
+        {filteredCountries.map(country =>
+          <p key={country.flag}>{country.name.common}</p>
+        )}
+      </div>
+    </div>
   )
 }
 
 export default App
+// name, capital, area, languages spoken, flag
