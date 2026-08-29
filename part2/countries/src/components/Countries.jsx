@@ -6,18 +6,16 @@ const Country = (props) => (
   </div>
 )
 
-const Countries = ({ countries, handleShowClick }) => {
-  return (
-    <div>
-      {countries.map(country =>
-        <Country
-          key={country.flag}
-          name={country.name.common}
-          onShowClick={() => handleShowClick(country.flag)}
-         />
-      )}
-    </div>
-  )
-}
+const Countries = ({ countries, handleShowClick }) => (
+  <div>
+    {countries.map(country =>
+      <Country
+        key={country.flag}
+        name={country.name.common}
+        onShowClick={() => handleShowClick(country.flag)}
+      />
+    )}
+  </div>
+)
 
 export default Countries

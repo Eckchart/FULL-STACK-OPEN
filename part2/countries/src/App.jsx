@@ -3,16 +3,32 @@ import axios from 'axios'
 import Countries from './components/Countries'
 import CountryInfo from './components/CountryInfo'
 
+const weatherApiKey = import.meta.env.VITE_WEATHER_API_KEY
+
 const App = () => {
   const [allCountries, setAllCountries] = useState(null)
+  const [filteredCountries, setFilteredCountries] = useState([])
   const [countriesFilterText, setCountriesFilterText] = useState('')
-  const [selectedCountryFlag, setSelectedCountryFlag] = useState(null)
+  const [country, setCountry] = useState(null)
+  const [weatherData, setWeatherData] = useState(null)
 
   useEffect(() => {
     axios
       .get('https://studies.cs.helsinki.fi/restcountries/api/all')
       .then(response => setAllCountries(response.data))
   }, [])
+
+  useEffect(() => {
+    if (!country) {
+      return
+    }
+    setWeatherData(null)  // to prevent race conditions
+    axios
+      .get('http://api.openweathermap.org/data/2.5/weather?' +
+        `q=${country.capital[0]}&units=metric&APPID=${weatherApiKey}`)
+      .then(response => setWeatherData(response.data))
+  }, [country])
+  
   if (!allCountries) {
     return (
       <div>
@@ -22,17 +38,19 @@ const App = () => {
   }
   
   const handleCountriesFilterChange = (event) => {
-    setCountriesFilterText(event.target.value)
-    setSelectedCountryFlag(null)
+    const newFilterText = event.target.value
+    const newFilteredCountries = allCountries.filter(c => (
+      c.name.common.toLowerCase().includes(newFilterText.toLowerCase())
+    ))
+    setCountriesFilterText(newFilterText)
+    setFilteredCountries(newFilteredCountries)
+    setCountry(newFilteredCountries.length === 1 ? newFilteredCountries[0] : null)
   }
 
   const handleShowClick = (countryFlag) => {
-    setSelectedCountryFlag(countryFlag)
+    setCountry(allCountries.find(c => c.flag === countryFlag))
   }
   
-  const filteredCountries = allCountries.filter(c => (
-    c.name.common.toLowerCase().includes(countriesFilterText.toLowerCase())
-  ))
   if (filteredCountries.length > 10) {
     return (
       <div>
@@ -42,28 +60,23 @@ const App = () => {
     )
   }
 
-  let country = null
-  if (selectedCountryFlag) {
-    country = allCountries.find(c => c.flag === selectedCountryFlag)
-  }
-  else if (filteredCountries.length === 1) {
-    country = filteredCountries[0]
-  }
-    
   return (
     <div>
       find countries <input value={countriesFilterText} onChange={handleCountriesFilterChange} />
       {country
         ?
-        <CountryInfo
-          commonName={country.name.common}
-          capital={country.capital}
-          area={country.area}
-          languages={country.languages}
-          flags={country.flags}
-        />
+        <div>
+          <CountryInfo
+            commonName={country.name.common}
+            capital={country.capital}  // can be multiple capitals...
+            area={country.area}
+            languages={country.languages}
+            flags={country.flags}
+            weatherData={weatherData}
+          />
+        </div>
         : 
-        // 0 U 1 < filteredCountries.length < 10
+        // 0 U 2 <= filteredCountries.length <= 10
         <Countries countries={filteredCountries} handleShowClick={handleShowClick} />
       }
     </div>
@@ -71,4 +84,3 @@ const App = () => {
 }
 
 export default App
-// name, capital, area, languages spoken, flag
