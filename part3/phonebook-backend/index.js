@@ -29,13 +29,13 @@ let persons = [
   }
 ]
 
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.send('<h1>PHONEBOOK BACKEND</h1>')
 })
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (_, res) => {
   res.json(persons)
 })
-app.get('/info', (req, res) => {
+app.get('/info', (_, res) => {
   const htmlAns = `
     <p>Phonebook has info for ${persons.length} people</p>
     <p>${new Date()}</p>
@@ -51,6 +51,13 @@ app.get('/api/persons/:id', (req, res) => {
     res.json(person)
   }
 })
+
+app.delete('/api/persons/:id', (req, res) => {
+  const id = req.params.id
+  persons = persons.filter(p => p.id !== id)
+  res.status(204).end()
+})
+
 
 const PORT = 3003
 app.listen(PORT, () => {
