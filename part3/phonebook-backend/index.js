@@ -1,10 +1,12 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
 // The json-parser takes the JSON data of a request, transforms it
 // into a JavaScript object and then attaches it to the body property
 // of the request object before the route handler is called.
 app.use(express.json())
+app.use(morgan('tiny'))
 
 let persons = [
   { 
@@ -65,7 +67,7 @@ app.post('/api/persons', (req, res) => {
   const body = req.body
   let errors = []
   if (!body.name) {
-    errors.push("name missing")
+    errors.push('name missing')
   }
   if (!body.number) {
     errors.push('number missing')
