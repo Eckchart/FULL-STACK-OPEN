@@ -17,7 +17,6 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(requestLogger)
-app.use(unknownEndpoint)
 //////////////////////////////////
 
 
@@ -88,6 +87,9 @@ app.post('/api/notes', (request, response) => {
   notes = notes.concat(note)
   response.json(note)
 })
+
+app.use(unknownEndpoint)
+
 
 const PORT = 3002
 app.listen(PORT, () => {
