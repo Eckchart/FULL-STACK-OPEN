@@ -29,6 +29,8 @@ let persons = [
   }
 ]
 
+const generateId = () => Math.floor(Math.random() * 1e5).toString()
+
 app.get('/', (_, res) => {
   res.send('<h1>PHONEBOOK BACKEND</h1>')
 })
@@ -36,7 +38,8 @@ app.get('/api/persons', (_, res) => {
   res.json(persons)
 })
 app.get('/info', (_, res) => {
-  const htmlAns = `
+  const htmlAns =
+  `
     <p>Phonebook has info for ${persons.length} people</p>
     <p>${new Date()}</p>
   `
@@ -56,6 +59,33 @@ app.delete('/api/persons/:id', (req, res) => {
   const id = req.params.id
   persons = persons.filter(p => p.id !== id)
   res.status(204).end()
+})
+
+app.post('/api/persons', (req, res) => {
+  const body = req.body
+  let errors = []
+  if (!body.name) {
+    errors.push("name missing")
+  }
+  if (!body.number) {
+    errors.push('number missing')
+  }
+  if (body.name && persons.find(p => p.name === body.name)) {
+    errors.push('name must be unique')
+  }
+  if (errors.length) {
+    return res.status(400).json({
+      'errors': errors
+    })
+  }
+
+  const newPerson = {
+    id: generateId(),
+    name: body.name,
+    number: body.number
+  }
+  persons = persons.concat(newPerson)
+  res.json(newPerson)
 })
 
 
