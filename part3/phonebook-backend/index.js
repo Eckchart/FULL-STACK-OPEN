@@ -6,7 +6,19 @@ const app = express()
 // into a JavaScript object and then attaches it to the body property
 // of the request object before the route handler is called.
 app.use(express.json())
-app.use(morgan('tiny'))
+
+// morgan configuration //
+
+morgan.token('post_data', (req) => JSON.stringify(req.body))
+app.use(morgan('tiny', {
+  skip: (req) => req.method === 'POST'
+}))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post_data', {
+  skip: (req) => req.method !== 'POST'
+}))
+
+//////////////////////////
+
 
 let persons = [
   { 
