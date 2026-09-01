@@ -1,6 +1,10 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
 app.use(express.json())
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:5174']
+}))
 
 
 //////// MY MIDDLEWARE ///////////
@@ -88,10 +92,11 @@ app.post('/api/notes', (request, response) => {
   response.json(note)
 })
 
+// has to be at the end of the routes
 app.use(unknownEndpoint)
 
 
-const PORT = 3002
+const PORT = process.env.PORT || 3002
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
