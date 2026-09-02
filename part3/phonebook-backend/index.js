@@ -6,6 +6,7 @@ const app = express()
 // into a JavaScript object and then attaches it to the body property
 // of the request object before the route handler is called.
 app.use(express.json())
+app.use(express.static('dist'))
 
 // morgan configuration //
 
