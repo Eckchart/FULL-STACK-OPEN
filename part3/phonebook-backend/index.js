@@ -1,5 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
+const Person = require('./models/person')
+
 const app = express()
 
 // The json-parser takes the JSON data of a request, transforms it
@@ -50,7 +53,9 @@ app.get('/', (_, res) => {
   res.send('<h1>PHONEBOOK BACKEND</h1>')
 })
 app.get('/api/persons', (_, res) => {
-  res.json(persons)
+  Person.find({}).then(persons => {
+    res.json(persons)
+  })
 })
 app.get('/info', (_, res) => {
   const htmlAns =
@@ -104,7 +109,7 @@ app.post('/api/persons', (req, res) => {
 })
 
 
-const PORT = process.env.PORT || 3003
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
