@@ -11,6 +11,19 @@ const app = express()
 app.use(express.json())
 app.use(express.static('dist'))
 
+
+// MIDDLEWARE CONFIG //
+
+const errorHandler = (error, req, res, next) => {
+  console.log('AN ERROR HAS OCCURRED:', error.message)
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformed id' })
+  }
+  next(error)
+}
+
+///////////////////////
+
 // morgan configuration //
 
 morgan.token('post_data', (req) => JSON.stringify(req.body))
@@ -47,8 +60,6 @@ let persons = [
   }
 ]
 
-const generateId = () => Math.floor(Math.random() * 1e5).toString()
-
 app.get('/', (_, res) => {
   res.send('<h1>PHONEBOOK BACKEND</h1>')
 })
@@ -75,7 +86,7 @@ app.get('/api/persons/:id', (req, res) => {
   }
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
   Person
     .findByIdAndDelete(id)
@@ -83,12 +94,10 @@ app.delete('/api/persons/:id', (req, res) => {
       console.log('deleted result:', deletedPerson)
       res.status(204).end()
     })
-    .catch(error => {
-      console.log('error', error)
-    })
+    .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
   let errors = []
   if (!body.name) {
@@ -108,10 +117,14 @@ app.post('/api/persons', (req, res) => {
     name: body.name,
     number: body.number
   })
-  newPerson.save().then(savedPerson => {
-    res.json(savedPerson)
-  })
+  newPerson.save()
+    .then(savedPerson => {
+      res.json(savedPerson)
+    })
+    .catch(error => next(error))
 })
+
+app.use(errorHandler)
 
 
 const PORT = process.env.PORT
