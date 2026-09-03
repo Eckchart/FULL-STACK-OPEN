@@ -1,5 +1,10 @@
 const mongoose = require('mongoose')
 
+if (process.argv.length < 3) {
+  console.log('too few arguments!')
+  process.exit(1)
+}
+
 // config
 const password = process.argv[2]
 const url = `mongodb+srv://fsopenUser:${password}@cluster0.4ahxgof.mongodb.net/phonebookApp?appName=Cluster0`
