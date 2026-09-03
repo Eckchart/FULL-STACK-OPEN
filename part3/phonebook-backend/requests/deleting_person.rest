@@ -1,2 +1,5 @@
-# DELETE http://localhost:3003/api/persons/1
+DELETE http://localhost:3003/api/persons/6a9942f01d09724dc374be62
+
+###
+
 DELETE https://phonebook-backend-pje1.onrender.com/api/persons/57388

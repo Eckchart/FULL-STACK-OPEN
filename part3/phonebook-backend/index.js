@@ -77,8 +77,15 @@ app.get('/api/persons/:id', (req, res) => {
 
 app.delete('/api/persons/:id', (req, res) => {
   const id = req.params.id
-  persons = persons.filter(p => p.id !== id)
-  res.status(204).end()
+  Person
+    .findByIdAndDelete(id)
+    .then(deletedPerson => {
+      console.log('deleted result:', deletedPerson)
+      res.status(204).end()
+    })
+    .catch(error => {
+      console.log('error', error)
+    })
 })
 
 app.post('/api/persons', (req, res) => {
@@ -94,9 +101,7 @@ app.post('/api/persons', (req, res) => {
   //   errors.push('name must be unique')
   // }
   if (errors.length > 0) {
-    return res.status(400).json({
-      'errors': errors
-    })
+    return res.status(400).send({ errors })
   }
 
   const newPerson = new Person({
