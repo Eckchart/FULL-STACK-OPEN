@@ -90,22 +90,22 @@ app.post('/api/persons', (req, res) => {
   if (!body.number) {
     errors.push('number missing')
   }
-  if (body.name && persons.find(p => p.name === body.name)) {
-    errors.push('name must be unique')
-  }
-  if (errors.length) {
+  // if (body.name && persons.find(p => p.name === body.name)) {
+  //   errors.push('name must be unique')
+  // }
+  if (errors.length > 0) {
     return res.status(400).json({
       'errors': errors
     })
   }
 
-  const newPerson = {
-    id: generateId(),
+  const newPerson = new Person({
     name: body.name,
     number: body.number
-  }
-  persons = persons.concat(newPerson)
-  res.json(newPerson)
+  })
+  newPerson.save().then(savedPerson => {
+    res.json(savedPerson)
+  })
 })
 
 

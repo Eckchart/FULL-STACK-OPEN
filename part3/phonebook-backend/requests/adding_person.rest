@@ -1,4 +1,13 @@
-# POST http://localhost:3003/api/persons
+POST http://localhost:3003/api/persons
+Content-Type: application/json
+
+{
+    "name": "ex 3.14 (PIIIIIIIIIIIII)",
+    "number": "314159265357989"
+}
+
+###
+
 POST https://phonebook-backend-pje1.onrender.com/api/persons 
 Content-Type: application/json
 
