@@ -18,6 +18,8 @@ const errorHandler = (error, req, res, next) => {
   console.log('AN ERROR HAS OCCURRED:', error.message)
   if (error.name === 'CastError') {
     return res.status(400).json({ error: 'malformed id' })
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message })
   }
   next(error)
 }
@@ -86,19 +88,6 @@ app.delete('/api/persons/:id', (req, res, next) => {
 
 app.post('/api/persons', (req, res, next) => {
   const body = req.body
-  let errors = []
-  if (!body.name) {
-    errors.push('name missing')
-  }
-  if (!body.number) {
-    errors.push('number missing')
-  }
-  // if (body.name && persons.find(p => p.name === body.name)) {
-  //   errors.push('name must be unique')
-  // }
-  if (errors.length > 0) {
-    return res.status(400).json({ errors })
-  }
 
   const newPerson = new Person({
     name: body.name,
@@ -115,6 +104,9 @@ app.put('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
   const { name, number } = req.body
 
+  // On update operations, mongoose validators are off by
+  // default, but we don't use any update() functions, so..
+  // we don't need to turn them on manually yet.
   Person
     .findById(id)
     .then(person => {
