@@ -21,6 +21,23 @@ const App = () => {
       })
   }, [])
 
+  // HELPER FUNCTIONS //
+
+  const clearInputFields = () => {
+    setNewName('')
+    setNewNumber('')
+  }
+
+  const setNotifState = (message, type) => {
+    setNotifMessage(message)
+    setTimeout(() => {
+      setNotifMessage(null)
+    }, 5000)
+    setMessageType(type)
+  }
+
+  //////////////////////
+
   const addPerson = (event) => {
     event.preventDefault()
     let person
@@ -38,15 +55,13 @@ const App = () => {
     }
     personService
       .create(newPersonObject)
-      .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson))
-        setNewName('')
-        setNewNumber('')
-        setNotifMessage(`Added ${returnedPerson.name}`)
-        setTimeout(() => {
-          setNotifMessage(null)
-        }, 5000)
-        setMessageType('success')
+      .then(createdPerson => {
+        setPersons(persons.concat(createdPerson))
+        clearInputFields()
+        setNotifState(`Added ${createdPerson.name}`, 'success')
+      })
+      .catch(error => {
+        setNotifState(error.response.data.error, 'error')
       })
   }
 
@@ -63,12 +78,8 @@ const App = () => {
       })
       .catch(error => {
         setPersons(persons.filter(p => p.id !== id))
-        setNotifMessage(`Information of ${personToDelete.name} has ` +
-          `already been removed from the server`)
-        setTimeout(() => {
-          setNotifMessage(null)
-        }, 5000)
-        setMessageType('error')
+        setNotifState(`Information of ${personToDelete.name} has `
+          + `already been removed from the server`, 'error')
       })
   }
 
@@ -81,22 +92,18 @@ const App = () => {
       .update(id, changedPerson)
       .then(updatedPerson => {
         setPersons(persons.map(p => p.id === updatedPerson.id ? updatedPerson : p))
-        setNewName('')
-        setNewNumber('')
-        setNotifMessage(`Updated ${updatedPerson.name}'s number to ${updatedPerson.number}`)
-        setTimeout(() => {
-          setNotifMessage(null)
-        }, 5000)
-        setMessageType('success')
+        clearInputFields()
+        setNotifState(`Updated ${updatedPerson.name}'s number to `
+          + `${updatedPerson.number}`, 'success')
       })
       .catch(error => {
         setPersons(persons.filter(p => p.id !== id))
-        setNotifMessage(`Information of ${changedPerson.name} has ` +
-          `already been removed from the server`)
-        setTimeout(() => {
-          setNotifMessage(null)
-        }, 5000)
-        setMessageType('error')
+        if (error.response.status === 404) {
+          setNotifState(`Information of ${changedPerson.name} has `
+            + `already been removed from the server`, 'error')
+        } else {
+          setNotifState(error.response.data.error, 'error')
+        }
       })
   }
 
