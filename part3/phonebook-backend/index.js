@@ -17,7 +17,7 @@ app.use(express.static('dist'))
 const errorHandler = (error, req, res, next) => {
   console.log('AN ERROR HAS OCCURRED:', error.message)
   if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformed id' })
+    return res.status(400).json({ error: 'malformed id' })
   }
   next(error)
 }
@@ -39,10 +39,13 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :p
 app.get('/', (_, res) => {
   res.send('<h1>PHONEBOOK BACKEND</h1>')
 })
-app.get('/api/persons', (_, res) => {
-  Person.find({}).then(persons => {
-    res.json(persons)
-  })
+app.get('/api/persons', (_, res, next) => {
+  Person
+    .find({})
+    .then(persons => {
+      res.json(persons)
+    })
+    .catch(error => next(error))
 })
 app.get('/info', (_, res, next) => {
   Person
@@ -53,7 +56,7 @@ app.get('/info', (_, res, next) => {
           <p>Phonebook has info for ${nrDocuments} people</p>
           <p>${new Date()}</p>
         `
-        res.send(htmlAns)
+      res.send(htmlAns)
     })
     .catch(error => next(error))
 })
@@ -65,7 +68,7 @@ app.get('/api/persons/:id', (req, res, next) => {
       if (!person) {
         return res.status(404).end()
       }
-      return res.json(person)
+      res.json(person)
     })
     .catch(error => next(error))
 })
@@ -94,7 +97,7 @@ app.post('/api/persons', (req, res, next) => {
   //   errors.push('name must be unique')
   // }
   if (errors.length > 0) {
-    return res.status(400).send({ errors })
+    return res.status(400).json({ errors })
   }
 
   const newPerson = new Person({
@@ -120,7 +123,7 @@ app.put('/api/persons/:id', (req, res, next) => {
       }
       person.name = name
       person.number = number
-      return person.save().then(updatedPerson => {
+      person.save().then(updatedPerson => {
         res.json(updatedPerson)
       })
     })
