@@ -36,30 +36,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :p
 
 //////////////////////////
 
-
-let persons = [
-  { 
-    "id": "1",
-    "name": "Arto Hellas", 
-    "number": "040-123456"
-  },
-  { 
-    "id": "2",
-    "name": "Ada Lovelace", 
-    "number": "39-44-5323523"
-  },
-  { 
-    "id": "3",
-    "name": "Dan Abramov", 
-    "number": "12-43-234345"
-  },
-  { 
-    "id": "4",
-    "name": "Mary Poppendieck", 
-    "number": "39-23-6423122"
-  }
-]
-
 app.get('/', (_, res) => {
   res.send('<h1>PHONEBOOK BACKEND</h1>')
 })
@@ -68,22 +44,30 @@ app.get('/api/persons', (_, res) => {
     res.json(persons)
   })
 })
-app.get('/info', (_, res) => {
-  const htmlAns =
-  `
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${new Date()}</p>
-  `
-  res.send(htmlAns)
+app.get('/info', (_, res, next) => {
+  Person
+    .countDocuments()
+    .then(nrDocuments => {
+      const htmlAns =
+        `
+          <p>Phonebook has info for ${nrDocuments} people</p>
+          <p>${new Date()}</p>
+        `
+        res.send(htmlAns)
+    })
+    .catch(error => next(error))
 })
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
-  const person = persons.find(p => p.id === id)
-  if (!person) {
-    res.status(404).end()
-  } else {
-    res.json(person)
-  }
+  Person
+    .findById(id)
+    .then(person => {
+      if (!person) {
+        return res.status(404).end()
+      }
+      return res.json(person)
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
