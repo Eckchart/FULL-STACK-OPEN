@@ -5,7 +5,7 @@ const listHelper = require('../utils/list_helper')
 describe('total likes', () => {
   test('of empty list is zero', () => {
     const listWithZeroBlogs = []
-    assert.strictEqual(listHelper.getTotalLikes(listWithZeroBlogs), 0)
+    assert.strictEqual(listHelper.totalLikes(listWithZeroBlogs), 0)
   })
 
   test('when list has only one blog equals the likes of that', () => {
@@ -19,7 +19,7 @@ describe('total likes', () => {
         __v: 0
       }
     ]
-    const result = listHelper.getTotalLikes(listWithOneBlog)
+    const result = listHelper.totalLikes(listWithOneBlog)
     assert.strictEqual(result, 5)
   })
 
@@ -74,7 +74,7 @@ describe('total likes', () => {
         __v: 0
       }
     ]
-    const result = listHelper.getTotalLikes(blogs)
+    const result = listHelper.totalLikes(blogs)
     assert.strictEqual(result, 36)
   })
 })
