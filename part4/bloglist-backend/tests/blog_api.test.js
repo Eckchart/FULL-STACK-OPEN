@@ -30,6 +30,23 @@ test('the unique identifier property of the blog posts is named `id`', async () 
   response.body.forEach(blog => assert(blog.id) && assert(blog._id === undefined))
 })
 
+test.only('a valid blog can be correctly added', async () => {
+  const newBlog = {
+    title: "testTitle",
+    author: "testAuthor",
+    url: "url",
+    likes: 69
+  }
+  await api
+    .post('/api/blogs/')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+  const blogsAfter = await api.get('/api/blogs')
+  assert.strictEqual(blogsAfter.body.length, helper.initialBlogs.length + 1)
+  assert(blogsAfter.body.some(blog => blog.title === newBlog.title))
+})
+
 
 after(async () => {
   await mongoose.connection.close()
