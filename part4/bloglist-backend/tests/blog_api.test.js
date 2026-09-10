@@ -88,6 +88,19 @@ test('if the `url` property is missing from the request, backend responds with s
     .expect('Content-Type', /application\/json/)
 })
 
+test.only('deletion of a blog succeeds with status 204 if id is valid', async () => {
+  const jsonBlogs = await helper.getAllBlogsInJson()
+  const blogToDelete = jsonBlogs[0]
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.getAllBlogsInJson()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+
+  const blogsAtEndIds = blogsAtEnd.map(blog => blog.id)
+  assert(!blogsAtEndIds.includes(blogToDelete.id))
+})
 
 after(async () => {
   await mongoose.connection.close()
