@@ -7,7 +7,7 @@ if (process.argv.length < 3) {
 
 // config //
 const password = process.argv[2]
-const url = `mongodb+srv://fsopenUser:${password}@cluster0.4ahxgof.mongodb.net/noteApp?appName=Cluster0`
+const url = `mongodb+srv://fsopenUser:${password}@cluster0.4ahxgof.mongodb.net/testNoteApp?appName=Cluster0`
 
 mongoose.set('strictQuery', false)
 
@@ -21,15 +21,15 @@ const noteSchema = new mongoose.Schema({
   important: Boolean
 })
 const Note = mongoose.model('Note', noteSchema)
-// const note = new Note({
-//   content: 'HTML is easy',
-//   important: true
-// })
+const note = new Note({
+  content: 'Test_content2',
+  important: true
+})
 
-// note.save().then(result => {
-//   console.log('note saved!')
-//   mongoose.connection.close()
-// })
+note.save().then(() => {
+  console.log('note saved!')
+  // mongoose.connection.close()
+})
 
 // The parameter of '.find()' is an object expressing search conditions.
 Note.find({}).then(result => {
