@@ -88,7 +88,7 @@ test('if the `url` property is missing from the request, backend responds with s
     .expect('Content-Type', /application\/json/)
 })
 
-test.only('deletion of a blog succeeds with status 204 if id is valid', async () => {
+test('deletion of a blog succeeds with status 204 if id is valid', async () => {
   const jsonBlogs = await helper.getAllBlogsInJson()
   const blogToDelete = jsonBlogs[0]
   await api
@@ -100,6 +100,27 @@ test.only('deletion of a blog succeeds with status 204 if id is valid', async ()
 
   const blogsAtEndIds = blogsAtEnd.map(blog => blog.id)
   assert(!blogsAtEndIds.includes(blogToDelete.id))
+})
+
+test('updating the information of an existing blog post works correctly', async () => {
+  const jsonBlogs = await helper.getAllBlogsInJson()
+  const blogToUpdate = jsonBlogs[0]
+  const newDataOfBlog = {
+    title: "NewTitle",
+    author: "NewAuthor",
+    url: "NewUrl",
+    likes: 6969
+  }
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(newDataOfBlog)
+    .expect('Content-Type', /application\/json/)
+  
+  assert.strictEqual(response.body.id, blogToUpdate.id)
+  assert.strictEqual(response.body.likes, newDataOfBlog.likes)
+  const blogsAtEnd = await helper.getAllBlogsInJson()
+  const blogsAtEndLikes = blogsAtEnd.map(blog => blog.likes)
+  assert(blogsAtEndLikes.includes(newDataOfBlog.likes))
 })
 
 after(async () => {
