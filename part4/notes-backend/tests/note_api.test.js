@@ -5,13 +5,16 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Note = require('../models/note')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 describe('when there is initially some notes saved', () => {
   beforeEach(async () => {
     await Note.deleteMany({})
-
+    await User.deleteMany({})
+    await User.insertMany(helper.initialUsers)
+    const userIds = (await helper.usersInDb()).map(user => user.id)
     // version 0 (INCORRECT):
     // helper.initialNotes.forEach(async (note) => {
     //   let noteObject = new Note(note)
@@ -25,14 +28,21 @@ describe('when there is initially some notes saved', () => {
     // const promiseArray = noteObjects.map(note => note.save())
     // await Promise.all(promiseArray)
 
-    // version 2 (CORRECT)
-    // for (const note of helper.initialNotes) {
-    //   const noteObject = new Note(note)
-    //   await noteObject.save()
-    // }
+    // version 2 (IDK)
+    // await Note.insertMany(helper.initialNotes)
 
     // version 3
-    await Note.insertMany(helper.initialNotes)
+    for (const note of helper.initialNotes) {
+      const noteObject = new Note(note)
+
+      const curUserId = userIds[Math.floor(Math.random() * userIds.length)]
+      noteObject['user'] = curUserId
+      await noteObject.save()
+
+      const curUser = await User.findById(curUserId)
+      curUser.notes = curUser.notes.concat(noteObject._id)
+      await curUser.save()
+    }
   })
 
 
@@ -63,7 +73,16 @@ describe('when there is initially some notes saved', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      assert.deepStrictEqual(resultNote.body, noteToView)
+      // When we do `response.json(note)` in the GET '/api/notes/:id'
+      // route, Express serializes note.user into a String, whereas
+      // in the `helper.notesInDb()` function, even if we return
+      // `notes.map(note => note.toJSON())`, that does NOT transform
+      // the `user` field of notes into a String - it remains an ObjectId.
+      // It's something like the difference between `JSON.stringify()` (which
+      // is what `response.json(note)` does) and `note.toJSON()` (which is
+      // what `helper.notesInDb()` does).
+      const normalizedNote = { ...noteToView, user: noteToView.user.toString() }
+      assert.deepStrictEqual(resultNote.body, normalizedNote)
     })
 
     test('fails with status code 404 if note does not exist', async () => {
@@ -81,9 +100,11 @@ describe('when there is initially some notes saved', () => {
 
   describe('addition of a new note', () => {
     test('succeeds with valid data', async () => {
+      const users = await helper.usersInDb()
       const newNote = {
         content: 'async/await simplifies making async calls',
-        important: true
+        important: true,
+        userId: users[0].id
       }
       await api
         .post('/api/notes')
