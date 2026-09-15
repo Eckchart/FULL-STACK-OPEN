@@ -6,7 +6,7 @@ POST http://localhost:3002/api/users
 Content-Type: application/json
 
 {
-    "username": "root2",
-    "name": "Superuser2",
-    "password": "$GreatPasswordB7W"
+    "username": "login_user",
+    "name": "Login",
+    "password": "Passw0rd!"
 }

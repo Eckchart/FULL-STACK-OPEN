@@ -4,9 +4,9 @@ GET http://localhost:3002/api/notes/
 
 POST http://localhost:3002/api/notes
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImxvZ2luX3VzZXIiLCJpZCI6IjZhYTU4YjdmNzhhNzcxMTYxY2VmYTNjYiIsImlhdCI6MTc4OTIzNjk2OH0.kNZgyTbXuHonU7oh8VbY1bBRYRnniH7UhmR0CsQz6YY
 
 {
-    "content": "content1",
-    "important": true,
-    "userId": "6aa5221aadf57f97610330c6"
+    "content": "Login_Content2",
+    "important": true
 }

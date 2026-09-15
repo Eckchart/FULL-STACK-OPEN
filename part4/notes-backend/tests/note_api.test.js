@@ -13,8 +13,17 @@ describe('when there is initially some notes saved', () => {
   beforeEach(async () => {
     await Note.deleteMany({})
     await User.deleteMany({})
-    await User.insertMany(helper.initialUsers)
-    const userIds = (await helper.usersInDb()).map(user => user.id)
+    for (const user of helper.initialUsers) {
+      // need to make a POST request for every user in
+      // order to have a password hash for every user
+      await api
+        .post('/api/users')
+        .send(user)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+    }
+
+    const users = await User.find({})
     // version 0 (INCORRECT):
     // helper.initialNotes.forEach(async (note) => {
     //   let noteObject = new Note(note)
@@ -34,12 +43,11 @@ describe('when there is initially some notes saved', () => {
     // version 3
     for (const note of helper.initialNotes) {
       const noteObject = new Note(note)
+      const curUser = users[Math.floor(Math.random() * users.length)]
 
-      const curUserId = userIds[Math.floor(Math.random() * userIds.length)]
-      noteObject['user'] = curUserId
+      noteObject['user'] = curUser.id
       await noteObject.save()
 
-      const curUser = await User.findById(curUserId)
       curUser.notes = curUser.notes.concat(noteObject._id)
       await curUser.save()
     }
@@ -100,14 +108,22 @@ describe('when there is initially some notes saved', () => {
 
   describe('addition of a new note', () => {
     test('succeeds with valid data', async () => {
-      const users = await helper.usersInDb()
+      // log the user in, first
+      const loggedInUser = await User.findOne({ username: helper.initialUsers[0].username })
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: loggedInUser.username, password: helper.initialUsers[0].password })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
       const newNote = {
         content: 'async/await simplifies making async calls',
         important: true,
-        userId: users[0].id
+        userId: loggedInUser.id
       }
       await api
         .post('/api/notes')
+        .set('Authorization', `Bearer ${loginResponse.body.token}`)
         .send(newNote)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -120,18 +136,25 @@ describe('when there is initially some notes saved', () => {
     })
 
     test('fails with status code 400 if data is invalid', async () => {
+      const loggedInUser = await User.findOne({ username: helper.initialUsers[0].username })
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: loggedInUser.username, password: helper.initialUsers[0].password })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
       const newNote = {
         important: true
       }
       await api
         .post('/api/notes')
+        .set('Authorization', `Bearer ${loginResponse.body.token}`)
         .send(newNote)
         .expect(400)
 
       const notesAtEnd = await helper.notesInDb()
       assert.strictEqual(notesAtEnd.length, helper.initialNotes.length)
     })
-
   })
 
   describe('deletion of a note', () => {
