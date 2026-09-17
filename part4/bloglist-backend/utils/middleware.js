@@ -1,5 +1,13 @@
 const logger = require('./logger')
 
+const tokenExtractor = (req, res, next) => {
+  const authorizationHeader = req.get('Authorization')
+  req.token = authorizationHeader && authorizationHeader.startsWith('Bearer')
+    ? authorizationHeader.replace('Bearer ', '')
+    : null
+  next()
+}
+
 const errorHandler = (error, req, res, next) => {
   logger.error(error.message)
   if (error.name === 'ValidationError') {
@@ -20,4 +28,4 @@ const unknownEndpoint = (req, res) => {
 }
 
 
-module.exports = { errorHandler, unknownEndpoint }
+module.exports = { tokenExtractor, errorHandler, unknownEndpoint }

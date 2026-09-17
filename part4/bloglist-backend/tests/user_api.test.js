@@ -1,5 +1,4 @@
 const { describe, test, beforeEach, after } = require('node:test')
-const { assert } = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const bcrypt = require('bcrypt')
@@ -64,10 +63,11 @@ describe('invalid users are not created', () => {
   })
 
   test('when password is missing', async () => {
+    // make sure `helper.initialUsers[1]` isn't already in the DB here!!
+    const userObjNotInDb = helper.initialUsers[1]
     const userToAdd = {
-      // make sure `helper.initialUsers[1]` isn't already in the DB here
-      username: helper.initialUsers[1].name,
-      name: helper.initialUsers[1].name,
+      username: userObjNotInDb.username,
+      name: userObjNotInDb.name,
     }
     await api
       .post('/api/users')
