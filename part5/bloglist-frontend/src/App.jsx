@@ -4,6 +4,7 @@ import blogService from './services/blogs'
 import LoginForm from './components/LoginForm'
 import loginService from './services/login'
 import BlogForm from './components/BlogForm'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -14,6 +15,10 @@ const App = () => {
     title: '',
     author: '',
     url: ''
+  })
+  const [notification, setNotification] = useState({
+    message: null,
+    type: null
   })
 
   useEffect(() => {
@@ -40,6 +45,7 @@ const App = () => {
 
       // log out automatically after 1 hour, when token expires
       setTimeout(handleLogout, 60 * 60 * 1000)
+      changeNotificationState('Logged in successfully', 'success')
 
       window.localStorage.setItem('loggedInUser', JSON.stringify(userObj))
       setUser(userObj)
@@ -47,7 +53,8 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (error) {
-      console.log('ERROR:', error.message)
+      console.error('ERROR when logging in:', error.message)
+      changeNotificationState(`${error.response.data.error}`, 'error')
     }
   }
 
@@ -69,6 +76,8 @@ const App = () => {
     e.preventDefault()
     try {
       const createdBlog = await blogService.create(blog)
+      changeNotificationState(`A new blog '${createdBlog.title}' by `
+        + `'${createdBlog.author}' has been added`, 'success')
       setBlogs(blogs.concat(createdBlog))
       setBlog({
         title: '',
@@ -76,25 +85,48 @@ const App = () => {
         url: ''
       })
     } catch (error) {
-      console.log('ERROR:', error.message)
+      console.error('ERROR in blog creation:', error.message)
+      changeNotificationState(`${error.response.data.error}`, 'error')
     }
+  }
+
+  const changeNotificationState = (message, type) => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification({ message: null, type: null })
+    }, 5 * 1000);
   }
 
   if (!user) {
     return (
-      <LoginForm
-        newUsername={username}
-        newPassword={password}
-        onUsernameChange={handleUsernameChange}
-        onPasswordChange={handlePasswordChange}
-        onLoginSubmit={handleLogin}
-      />
+      <div>
+        <h2>log in to application</h2>
+
+        <Notification
+          message={notification.message}
+          type={notification.type}
+        />
+
+        <LoginForm
+          newUsername={username}
+          newPassword={password}
+          onUsernameChange={handleUsernameChange}
+          onPasswordChange={handlePasswordChange}
+          onLoginSubmit={handleLogin}
+        />
+      </div>
     )
   }
 
   return (
     <div>
       <h2>blogs</h2>
+
+      <Notification
+        message={notification.message}
+        type={notification.type}
+      />
+      
       <p>
         {user.name} logged in &nbsp;
         <button onClick={handleLogout}>logout</button>

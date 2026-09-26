@@ -1,6 +1,5 @@
 const LoginForm = (props) => (
   <div>
-    <h2>log in to application</h2>
     <form onSubmit={props.onLoginSubmit}>
       <div>
         <label>
