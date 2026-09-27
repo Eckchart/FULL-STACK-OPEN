@@ -12,11 +12,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [blog, setBlog] = useState({
-    title: '',
-    author: '',
-    url: ''
-  })
   const [notification, setNotification] = useState({
     message: null,
     type: null
@@ -74,19 +69,13 @@ const App = () => {
     setUser(null)
   }
 
-  const handleBlogCreation = async (e) => {
-    e.preventDefault()
+  const addBlog = async (blog) => {
     blogFormRef.current.toggleVisibility()
     try {
       const createdBlog = await blogService.create(blog)
       changeNotificationState(`A new blog '${createdBlog.title}' by `
         + `'${createdBlog.author}' has been added`, 'success')
       setBlogs(blogs.concat(createdBlog))
-      setBlog({
-        title: '',
-        author: '',
-        url: ''
-      })
     } catch (error) {
       console.error('ERROR in blog creation:', error.message)
       changeNotificationState(`${error.response.data.error}`, 'error')
@@ -136,13 +125,7 @@ const App = () => {
       </p>
 
       <Togglable buttonLabel="add new blog" ref={blogFormRef}>
-        <BlogForm
-          onBlogSubmit={handleBlogCreation}
-          blog={blog}
-          onTitleChange={(e) => setBlog({ ...blog, title: e.target.value })}
-          onAuthorChange={(e) => setBlog({ ...blog, author: e.target.value })}
-          onUrlChange={(e) => setBlog({ ...blog, url: e.target.value })}
-        />
+        <BlogForm addBlog={addBlog} />
       </Togglable>
 
       {blogs.map(blog =>
