@@ -31,7 +31,7 @@ blogsRouter.delete('/:id', async (req, res) => {
   }
 
   // if you don't use toString() for both ObjectIds, we
-  // to compare them with `.equals()`, NOT `!==`
+  // need to compare them with `.equals()`, NOT `!==`
   if (blog.user.toString() !== user._id.toString()) {
     return res.status(401).json({ error: 'unauthorized operation' })
   }
