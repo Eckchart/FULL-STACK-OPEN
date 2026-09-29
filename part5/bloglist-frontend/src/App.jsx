@@ -25,9 +25,9 @@ const App = () => {
   useEffect(() => {
     const userObjJson = window.localStorage.getItem('loggedInUser')
     if (userObjJson) {
-      const user = JSON.parse(userObjJson)
-      blogService.setToken(user.token)
-      setUser(user)
+      const loggedInUser = JSON.parse(userObjJson)
+      blogService.setToken(loggedInUser.token)
+      setUser(loggedInUser)
     }
   }, [])
 
@@ -70,9 +70,10 @@ const App = () => {
   }
 
   const addBlog = async (blog) => {
-    blogFormRef.current.toggleVisibility()
     try {
       const createdBlog = await blogService.create(blog)
+      createdBlog.user = user
+      blogFormRef.current.toggleVisibility()
       changeNotificationState(`A new blog '${createdBlog.title}' by `
         + `'${createdBlog.author}' has been added`, 'success')
       setBlogs(blogs.concat(createdBlog))
@@ -85,10 +86,25 @@ const App = () => {
   const updateBlog = async (blog) => {
     try {
       const updatedBlog = await blogService.update(blog)
+      updatedBlog.user = blog.user
       const newBlogs = blogs.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog)
       setBlogs(newBlogs)
     } catch (error) {
-      console.error('error:', error)
+      console.error('ERROR in blog update:', error.message)
+      changeNotificationState(`${error.response.data.error}`, 'error')
+    }
+  }
+
+  const handleDeleteBlog = async (blogToDelete) => {
+    if (!window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}`)) {
+      return
+    }
+    try {
+      await blogService.destroy(blogToDelete.id)
+      const newBlogs = blogs.filter(blog => blog.id !== blogToDelete.id)
+      setBlogs(newBlogs)
+    } catch (error) {
+      console.error('ERROR in blog deletion:', error.message)
       changeNotificationState(`${error.response.data.error}`, 'error')
     }
   }
@@ -121,6 +137,10 @@ const App = () => {
     )
   }
 
+  const blogsSortedByLikes = blogs.toSorted(
+    (blog1, blog2) => blog2.likes - blog1.likes
+  )
+
   return (
     <div>
       <h2>blogs</h2>
@@ -139,8 +159,14 @@ const App = () => {
         <BlogForm addBlog={addBlog} />
       </Togglable>
 
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+      {blogsSortedByLikes.map(blog =>
+        <Blog
+          key={blog.id}
+          blog={blog}
+          loggedInUser={user}
+          onDeleteBlog={() => handleDeleteBlog(blog)}
+          updateBlog={updateBlog}
+        />
       )}
     </div>
   )
