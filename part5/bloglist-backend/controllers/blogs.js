@@ -25,8 +25,8 @@ blogsRouter.delete('/:id', async (req, res) => {
   // user who is not authorized to do so)
   const user = req.user
   const blogId = req.params.id
-  const blog = await Blog.findById(blogId)
-  if (!blog) {
+  const blogToDelete = await Blog.findById(blogId)
+  if (!blogToDelete) {
     // the case where the id is invalid (i.e. malformed)
     // is handled in our error handler middleware.
     return res.status(404).json({ error: 'blog not found' })
@@ -34,24 +34,22 @@ blogsRouter.delete('/:id', async (req, res) => {
 
   // if you don't use toString() for both ObjectIds, we
   // need to compare them with `.equals()`, NOT `!==`
-  if (blog.user.toString() !== user._id.toString()) {
+  if (blogToDelete.user.toString() !== user._id.toString()) {
     return res.status(401).json({ error: 'unauthorized operation' })
   }
-  await blog.deleteOne()
+  
+  user.blogs = user.blogs.filter(b => b._id.toString() !== blogToDelete._id.toString())
+  await user.save()
+  await blogToDelete.deleteOne()
   res.status(204).end()
 })
 
 blogsRouter.put('/:id', async (req, res) => {
-  // the user that made this PUT request
-  const user = req.user
   const blogId = req.params.id
   const newBlogValues = req.body
   const blogToUpdate = await Blog.findById(blogId)
   if (!blogToUpdate) {
     return res.status(404).json({ error: 'blog not found' })
-  }
-  if (user._id.toString() !== blogToUpdate.user.toString()) {
-    return res.status(401).json({ error: 'unauthorized operation' })
   }
   
   blogToUpdate.title  = newBlogValues.title

@@ -20,7 +20,7 @@ const tokenExtractor = (req, res, next) => {
 
 const userExtractor = async (req, res, next) => {
   // Maybe careful with this in the future!!
-  if (req.method === 'GET') {
+  if (req.method === 'GET' || req.method === 'PUT') {
     next()
     return
   }
