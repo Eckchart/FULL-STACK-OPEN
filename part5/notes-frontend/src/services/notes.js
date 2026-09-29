@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from 'axios'
 
 const baseUrl = '/api/notes'
 let token = null
@@ -24,7 +24,7 @@ const create = async (newObject) => {
       Authorization: token
     }
   }
-  
+
   const response = await axios.post(baseUrl, newObject, config)
   return response.data
 }

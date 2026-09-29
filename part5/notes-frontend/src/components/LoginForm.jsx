@@ -1,35 +1,43 @@
-const LoginForm = (props) => (
-  <div>
-    <h2>Login</h2>
-    <form onSubmit={props.onLoginSubmit}>
-      <div>
-        <label>
-          Username
-          &nbsp;
-          <input
-            type="text"
-            value={props.username}
-            onChange={props.onUsernameChange}
-          />
-        </label>
-      </div>
+import { useState } from 'react'
 
-      <div>
-        <label>
-          Password
-          &nbsp;
-          <input
-            type="text"
-            value={props.password}
-            onChange={props.onPasswordChange}
-          />
-        </label>
-      </div>
+const LoginForm = ({ onLogin }) => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
-      <button type="submit">login</button>
-    </form>
-  </div>
-)
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    await onLogin(username, password)
+    setUsername('')
+    setPassword('')
+  }
+
+  return (
+    <div>
+      <h2>Login</h2>
+
+      <form onSubmit={handleSubmit}>
+        <div>
+          username
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+
+        <div>
+          password
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <button type="submit">login</button>
+      </form>
+    </div>
+  )
+}
 
 
 export default LoginForm
