@@ -31,7 +31,8 @@ const App = () => {
     }
   }, [])
 
-  if (!user && window.localStorage.getItem('loggedInUser')) {
+  if (blogs.length === 0
+      || (!user && window.localStorage.getItem('loggedInUser'))) {
     return null
   }
 
