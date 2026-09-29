@@ -113,7 +113,7 @@ const App = () => {
     setNotification({ message, type })
     setTimeout(() => {
       setNotification({ message: null, type: null })
-    }, 5 * 1000);
+    }, 5 * 1000)
   }
 
   if (!user) {

@@ -1,12 +1,12 @@
-import { useState } from "react"
-    
+import { useState } from 'react'
+
 const BlogForm = ({ addBlog }) => {
   const [blog, setBlog] = useState({
     title: '',
     author: '',
     url: ''
   })
-  
+
   const handleBlogSubmit = async (e) => {
     e.preventDefault()
     await addBlog(blog)
@@ -16,7 +16,7 @@ const BlogForm = ({ addBlog }) => {
       url: ''
     })
   }
-  
+
   return (
     <div>
       <h2>create new</h2>
