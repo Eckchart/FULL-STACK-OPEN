@@ -29,7 +29,7 @@ const Blog = ({ blog, loggedInUser, updateBlog, onDeleteBlog }) => {
 
       {showDetails &&
         <>
-          {blog.url}
+          <span>{blog.url}</span>
           <div>
             {blog.likes}
             <button onClick={incrementLikes}>like</button>
