@@ -6,23 +6,23 @@ const Togglable = (props) => {
   const hideWhenVisible = { display: visible ? 'none' : '' }
   const showWhenVisible = { display: visible ? '' : 'none' }
 
-  const toggleVisiblity = () => {
+  const toggleVisibility = () => {
     setVisible(!visible)
   }
 
   useImperativeHandle(props.ref, () => {
-    return { toggleVisiblity }
+    return { toggleVisibility }
   })
 
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisiblity}>{props.buttonLabel}</button>
+        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
       </div>
 
       <div style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisiblity}>cancel</button>
+        <button onClick={toggleVisibility}>cancel</button>
       </div>
     </div>
   )
