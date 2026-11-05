@@ -74,5 +74,26 @@ describe('Blog app', () => {
       const likeDiv = likeButton.locator('..')
       await expect(likeDiv).toContainText('1')
     })
+
+    test('the user who added the blog can delete the blog', async ({ page }) => {
+      await page.getByRole('button', { name: 'add new blog' }).click()
+      await createBlog(page, 'title3', 'author3', 'url3')
+
+      // expand blog details
+      await page.getByRole('button', { name: 'view' }).click()
+
+      // page.once runs only for the next occurrence of window.confirm()
+      page.once('dialog', async (dialog) => {
+        expect(dialog.type()).toBe('confirm')
+        expect(dialog.message()).toBe('Remove blog title3 by author3')
+
+        await dialog.accept()
+      })
+
+      // click remove button and accept the window.confirm() dialog
+      await page.getByRole('button', { name: 'remove' }).click()
+
+      await expect(page.getByText('title3 author3')).not.toBeVisible()
+    })
   })
 })
