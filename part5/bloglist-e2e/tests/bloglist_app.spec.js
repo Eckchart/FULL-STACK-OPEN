@@ -44,4 +44,26 @@ describe('Blog app', () => {
       await expect(errorDiv).toContainText('Incorrect username or password')
     })
   })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await loginWith(page, 'username1', 'password1')
+    })
+
+    test.only('a new blog can be created', async ({ page }) => {
+      // click button to display the BlogForm
+      await page.getByRole('button', { name: 'add new blog' }).click()
+
+      // fill in values
+      await page.getByLabel('title:').fill('title1')
+      await page.getByLabel('author:').fill('author1')
+      await page.getByLabel('url:').fill('url1')
+
+      // click create button
+      await page.getByRole('button', { name: 'create' }).click()
+
+      await expect(page.getByText('title1 author1')).toBeVisible()
+      await expect(page.getByRole('button', { name: 'view' })).toBeVisible()
+    })
+  })
 })
