@@ -21,6 +21,12 @@ describe('Blog app', () => {
       }
     })
     
+    // 1. DB is reset while an old token remains in localStorage
+    // 2. the logged-in user is deleted via a call to '/api/testing/reset',
+    // but the frontend still uses that old logged-in user, with an old
+    // token (it's cached in there or something).
+    // so clear storage before logging in with the new user
+    await page.addInitScript(() => localStorage.clear())
     await page.goto('/')
   })
 
@@ -98,7 +104,7 @@ describe('Blog app', () => {
         await expect(page.getByText('title1 author1')).not.toBeVisible()
       })
 
-      test.only('only the user who added the blog sees the blog delete button', async ({ page }) => {
+      test('only the user who added the blog sees the blog delete button', async ({ page }) => {
         // expand blog details
         await page.getByRole('button', { name: 'view' }).click()
 
@@ -116,7 +122,47 @@ describe('Blog app', () => {
         await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
       })
 
-      
+      test('blogs are arranged in decreasing order of likes', async ({ page }) => {
+        await page.getByRole('button', { name: 'add new blog' }).click()
+        await createBlog(page, 'title2', 'author2', 'url2')
+
+        // this matches the two <div></div> blog elements
+        const blogsDivList = page.locator('.blogs > div')
+        const initialBlog1Div = blogsDivList.filter({ hasText: 'title1 author1' })
+        const initialBlog2Div = blogsDivList.filter({ hasText: 'title2 author2' })
+
+        // expand details of both blogs
+        await initialBlog1Div.getByRole('button', { name: 'view' }).click()
+        await initialBlog2Div.getByRole('button', { name: 'view' }).click()
+
+        // like first blog
+        await initialBlog1Div.getByRole('button', { name: 'like' }).click()
+
+        // order should still be:
+        // (blog with) title1 (1 like)
+        // (blog with) title2 (0 likes)
+        await expect(blogsDivList.nth(0).getByText('title1')).toBeVisible()
+        await expect(blogsDivList.nth(1).getByText('title2')).toBeVisible()
+
+        // like second blog twice, so that it gets re-ordered
+        // to be the first blog in the list, like so:
+        // (blog with) title2 (2 likes)
+        // (blog with) title1 (1 like)
+        const likeButton = initialBlog2Div.getByRole('button', { name: 'like' })
+        await likeButton.click()
+
+        // need to wait for the like count (api update) to actually update!
+        await expect(initialBlog2Div).toContainText('1')
+
+        await likeButton.click()
+        await expect(initialBlog2Div).toContainText('2')
+
+        // order should now be:
+        // (blog with) title2 (2 likes)
+        // (blog with) title1 (1 like)
+        await expect(blogsDivList.nth(0).getByText('title2')).toBeVisible()
+        await expect(blogsDivList.nth(1).getByText('title1')).toBeVisible()
+      })
     })
   })
 })
