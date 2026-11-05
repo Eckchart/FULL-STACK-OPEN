@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith } = require('./helper')
+const { loginWith, createBlog } = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -50,20 +50,29 @@ describe('Blog app', () => {
       await loginWith(page, 'username1', 'password1')
     })
 
-    test.only('a new blog can be created', async ({ page }) => {
+    test('a new blog can be created', async ({ page }) => {
       // click button to display the BlogForm
       await page.getByRole('button', { name: 'add new blog' }).click()
 
-      // fill in values
-      await page.getByLabel('title:').fill('title1')
-      await page.getByLabel('author:').fill('author1')
-      await page.getByLabel('url:').fill('url1')
-
-      // click create button
-      await page.getByRole('button', { name: 'create' }).click()
+      await createBlog(page, 'title1', 'author1', 'url1')
 
       await expect(page.getByText('title1 author1')).toBeVisible()
       await expect(page.getByRole('button', { name: 'view' })).toBeVisible()
+    })
+
+    test('a blog can be liked', async ({ page }) => {
+      await page.getByRole('button', { name: 'add new blog' }).click()
+
+      await createBlog(page, 'title2', 'author2', 'url2')
+      
+      // expand blog details
+      await page.getByRole('button', { name: 'view' }).click()
+      const likeButton = page.getByRole('button', { name: 'like' })
+      await likeButton.click()
+
+      // blog should have exactly 1 like since it's newly created
+      const likeDiv = likeButton.locator('..')
+      await expect(likeDiv).toContainText('1')
     })
   })
 })
