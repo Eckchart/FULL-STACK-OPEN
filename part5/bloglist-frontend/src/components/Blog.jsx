@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 const Blog = ({ blog, loggedInUser, updateBlog, onDeleteBlog }) => {
-  const [showDetails, setShowDetails] = useState(false)
+  // const [showDetails, setShowDetails] = useState(false)
 
   const blogStyle = {
     paddingTop: 10,
@@ -22,12 +22,12 @@ const Blog = ({ blog, loggedInUser, updateBlog, onDeleteBlog }) => {
         <span>{blog.title}</span>
         {' '}
         <span>{blog.author}</span>
-        <button onClick={() => setShowDetails(!showDetails)}>
+        {/* <button onClick={() => setShowDetails(!showDetails)}>
           {showDetails ? 'hide' : 'view'}
-        </button>
+        </button> */}
       </div>
 
-      {showDetails &&
+      {/* {showDetails &&
         <>
           <span>{blog.url}</span>
           <div>
@@ -42,7 +42,7 @@ const Blog = ({ blog, loggedInUser, updateBlog, onDeleteBlog }) => {
             </div>
           }
         </>
-      }
+      } */}
     </div>
   )
 }

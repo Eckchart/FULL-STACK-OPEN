@@ -1,22 +1,16 @@
-import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
+import { useState, useEffect } from 'react'
 import blogService from './services/blogs'
 import LoginForm from './components/LoginForm'
 import loginService from './services/login'
-import BlogForm from './components/BlogForm'
-import Notification from './components/Notification'
-import Togglable from './components/Togglable'
+import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import BlogList from './components/BlogList'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [notification, setNotification] = useState({
-    message: null,
-    type: null
-  })
-  const blogFormRef = useRef()
+  const navigate = useNavigate()
 
   useEffect(() => {
     blogService.getAll().then(blogs => setBlogs(blogs))
@@ -42,16 +36,15 @@ const App = () => {
 
       // log out automatically after 1 hour, when token expires
       setTimeout(handleLogout, 60 * 60 * 1000)
-      changeNotificationState('Logged in successfully', 'success')
 
       window.localStorage.setItem('loggedInUser', JSON.stringify(userObj))
       setUser(userObj)
       blogService.setToken(userObj.token)
       setUsername('')
       setPassword('')
+      navigate('/')
     } catch (error) {
       console.error('ERROR when logging in:', error.message)
-      changeNotificationState(`${error.response.data.error}`, 'error')
     }
   }
 
@@ -67,19 +60,16 @@ const App = () => {
     window.localStorage.removeItem('loggedInUser')
     blogService.setToken(null)
     setUser(null)
+    navigate('/')
   }
 
   const addBlog = async (blog) => {
     try {
       const createdBlog = await blogService.create(blog)
       createdBlog.user = user
-      blogFormRef.current.toggleVisibility()
-      changeNotificationState(`A new blog '${createdBlog.title}' by `
-        + `'${createdBlog.author}' has been added`, 'success')
       setBlogs(blogs.concat(createdBlog))
     } catch (error) {
       console.error('ERROR in blog creation:', error.message)
-      changeNotificationState(`${error.response.data.error}`, 'error')
     }
   }
 
@@ -91,7 +81,6 @@ const App = () => {
       setBlogs(newBlogs)
     } catch (error) {
       console.error('ERROR in blog update:', error.message)
-      changeNotificationState(`${error.response.data.error}`, 'error')
     }
   }
 
@@ -105,71 +94,68 @@ const App = () => {
       setBlogs(newBlogs)
     } catch (error) {
       console.error('ERROR in blog deletion:', error.message)
-      changeNotificationState(`${error.response.data.error}`, 'error')
     }
   }
 
-  const changeNotificationState = (message, type) => {
-    setNotification({ message, type })
-    setTimeout(() => {
-      setNotification({ message: null, type: null })
-    }, 5 * 1000)
+  const padding = {
+    padding: 5
   }
 
   if (!user) {
     return (
       <div>
-        <h2>log in to application</h2>
+        <div>
+          <Link style={padding} to="/">blogs</Link>
+          <Link style={padding} to="/login">login</Link>
+        </div>
 
-        <Notification
-          message={notification.message}
-          type={notification.type}
-        />
+        <Routes>
+          <Route path="/" element={<BlogList blogs={blogs} />} />
 
-        <LoginForm
-          newUsername={username}
-          newPassword={password}
-          onUsernameChange={handleUsernameChange}
-          onPasswordChange={handlePasswordChange}
-          onLoginSubmit={handleLogin}
-        />
+          <Route path="/login" element={
+            <LoginForm
+              newUsername={username}
+              newPassword={password}
+              onUsernameChange={handleUsernameChange}
+              onPasswordChange={handlePasswordChange}
+              onLoginSubmit={handleLogin}
+            />
+          } />
+        </Routes>
       </div>
     )
   }
 
-  const blogsSortedByLikes = blogs.toSorted(
-    (blog1, blog2) => blog2.likes - blog1.likes
-  )
+  // const blogsSortedByLikes = blogs.toSorted(
+  //   (blog1, blog2) => blog2.likes - blog1.likes
+  // )
 
+  // user is logged in here
   return (
     <div>
-      <h2>blogs</h2>
+      <div>
+        <Link style={padding} to="/">blogs</Link>
 
-      <Notification
-        message={notification.message}
-        type={notification.type}
-      />
-
-      <p>
-        {user.name} logged in &nbsp;
         <button onClick={handleLogout}>logout</button>
-      </p>
-
-      <Togglable buttonLabel="add new blog" ref={blogFormRef}>
-        <BlogForm addBlog={addBlog} />
-      </Togglable>
-
-      <div className="blogs">
-        {blogsSortedByLikes.map(blog =>
-          <Blog
-            key={blog.id}
-            blog={blog}
-            loggedInUser={user}
-            onDeleteBlog={() => handleDeleteBlog(blog)}
-            updateBlog={updateBlog}
-          />
-        )}
       </div>
+
+      <Routes>
+        <Route path="/" element={<BlogList blogs={blogs} />} />
+
+        <Route path="/login" element={
+          <LoginForm
+            newUsername={username}
+            newPassword={password}
+            onUsernameChange={handleUsernameChange}
+            onPasswordChange={handlePasswordChange}
+            onLoginSubmit={handleLogin}
+          />
+        } />
+
+        {/* <Route path="/create" element={
+          <NoteForm createNote={addNote} />
+        } /> */}
+      </Routes>
     </div>
   )
 }
