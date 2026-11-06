@@ -128,6 +128,10 @@ describe('Blog app', () => {
 
         // this matches the two <div></div> blog elements
         const blogsDivList = page.locator('.blogs > div')
+
+        // if we had used .nth(), that would have changed the order of these locators
+        // if the blogs they point to were rearranged (which they should be in this test),
+        // in "real-time", i.e. after we like them.
         const initialBlog1Div = blogsDivList.filter({ hasText: 'title1 author1' })
         const initialBlog2Div = blogsDivList.filter({ hasText: 'title2 author2' })
 
