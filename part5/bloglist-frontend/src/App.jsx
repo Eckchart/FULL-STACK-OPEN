@@ -6,12 +6,20 @@ import { Routes, Route, Link, useNavigate, useMatch } from 'react-router-dom'
 import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(() => {
+    const userObjJson = window.localStorage.getItem('loggedInUser')
+    return userObjJson ? JSON.parse(userObjJson) : null
+  })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [notification, setNotification] = useState({
+    message: null,
+    type: null
+  })
   const navigate = useNavigate()
   const match = useMatch('/blogs/:id')
 
@@ -20,13 +28,8 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const userObjJson = window.localStorage.getItem('loggedInUser')
-    if (userObjJson) {
-      const loggedInUser = JSON.parse(userObjJson)
-      blogService.setToken(loggedInUser.token)
-      setUser(loggedInUser)
-    }
-  }, [])
+    blogService.setToken(user?.token || null)
+  }, [user])
 
   if (!user && window.localStorage.getItem('loggedInUser')) {
     return null
@@ -42,12 +45,13 @@ const App = () => {
 
       window.localStorage.setItem('loggedInUser', JSON.stringify(userObj))
       setUser(userObj)
-      blogService.setToken(userObj.token)
+      // blogService.setToken(userObj.token)
       setUsername('')
       setPassword('')
       navigate('/')
     } catch (error) {
       console.error('ERROR when logging in:', error.message)
+      changeNotificationState(`${error.response.data.error}`, 'error')
     }
   }
 
@@ -61,7 +65,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedInUser')
-    blogService.setToken(null)
+    // blogService.setToken(null)
     setUser(null)
     navigate('/')
   }
@@ -70,9 +74,12 @@ const App = () => {
     try {
       const createdBlog = await blogService.create(blog)
       createdBlog.user = user
+      changeNotificationState(`A new blog '${createdBlog.title}' by `
+        + `'${createdBlog.author}' has been added`, 'success')
       setBlogs(blogs.concat(createdBlog))
     } catch (error) {
       console.error('ERROR in blog creation:', error.message)
+      changeNotificationState(`${error.response.data.error}`, 'error')
     }
   }
 
@@ -84,6 +91,7 @@ const App = () => {
       setBlogs(newBlogs)
     } catch (error) {
       console.error('ERROR in blog update:', error.message)
+      changeNotificationState(`${error.response.data.error}`, 'error')
     }
   }
 
@@ -98,7 +106,15 @@ const App = () => {
       navigate('/')
     } catch (error) {
       console.error('ERROR in blog deletion:', error.message)
+      changeNotificationState(`${error.response.data.error}`, 'error')
     }
+  }
+
+  const changeNotificationState = (message, type) => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification({ message: null, type: null })
+    }, 5 * 1000)
   }
 
   const padding = {
@@ -114,10 +130,19 @@ const App = () => {
       <div>
         <Link style={padding} to="/">blogs</Link>
 
-        {user && <Link style={padding} to="/create">new blog</Link>}
-        {user && <button onClick={handleLogout}>logout</button>}
+        {user &&
+          <>
+            <Link style={padding} to="/create">new blog</Link>
+            <button onClick={handleLogout}>logout</button>
+          </>
+        }
         {!user && <Link style={padding} to="/login">login</Link>}
       </div>
+
+      <Notification
+        message={notification.message}
+        type={notification.type}
+      />
 
       <Routes>
         <Route path="/" element={<BlogList blogs={blogs} />} />

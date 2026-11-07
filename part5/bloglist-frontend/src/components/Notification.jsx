@@ -10,7 +10,8 @@ const Notification = ({ message, type }) => {
     borderStyle: 'solid',
     borderRadius: '5px',
     padding: '10px',
-    marginBottom: '10px'
+    marginBottom: '10px',
+    marginTop: '10px'
   }
 
   return (
