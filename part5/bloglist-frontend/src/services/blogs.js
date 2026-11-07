@@ -22,9 +22,15 @@ const create = async (newBlogObj) => {
 }
 
 const update = async (updatedBlogObj) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
   const response = await axios.put(
     `${baseUrl}/${updatedBlogObj.id}`,
-    updatedBlogObj
+    updatedBlogObj,
+    config
   )
   return response.data
 }

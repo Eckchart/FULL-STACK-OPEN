@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import Blog from './Blog'
 import blogService from '../services/blogs'
 import Notification from './Notification'
+import { Link } from 'react-router-dom'
 
 const BlogList = ({ blogs }) => {
   const [user, setUser] = useState(null)
@@ -85,15 +85,15 @@ const BlogList = ({ blogs }) => {
       {/* <BlogForm addBlog={addBlog} /> */}
 
       <div className="blogs">
-        {blogsSortedByLikes.map(blog =>
-          <Blog
-            key={blog.id}
-            blog={blog}
-            loggedInUser={user}
-            onDeleteBlog={() => handleDeleteBlog(blog)}
-            updateBlog={updateBlog}
-          />
-        )}
+        <ul>
+          {blogsSortedByLikes.map(blog =>
+            <li key={blog.id}>
+              <Link to={`/blogs/${blog.id}`}>
+                {`${blog.title} ${blog.author}`}
+              </Link>
+            </li>
+          )}
+        </ul>
       </div>
     </div>
   )

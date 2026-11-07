@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import blogService from './services/blogs'
 import LoginForm from './components/LoginForm'
 import loginService from './services/login'
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate, useMatch } from 'react-router-dom'
 import BlogList from './components/BlogList'
+import Blog from './components/Blog'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -11,6 +12,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
+  const match = useMatch('/blogs/:id')
 
   useEffect(() => {
     blogService.getAll().then(blogs => setBlogs(blogs))
@@ -101,34 +103,9 @@ const App = () => {
     padding: 5
   }
 
-  if (!user) {
-    return (
-      <div>
-        <div>
-          <Link style={padding} to="/">blogs</Link>
-          <Link style={padding} to="/login">login</Link>
-        </div>
-
-        <Routes>
-          <Route path="/" element={<BlogList blogs={blogs} />} />
-
-          <Route path="/login" element={
-            <LoginForm
-              newUsername={username}
-              newPassword={password}
-              onUsernameChange={handleUsernameChange}
-              onPasswordChange={handlePasswordChange}
-              onLoginSubmit={handleLogin}
-            />
-          } />
-        </Routes>
-      </div>
-    )
-  }
-
-  // const blogsSortedByLikes = blogs.toSorted(
-  //   (blog1, blog2) => blog2.likes - blog1.likes
-  // )
+  const blog = match
+    ? blogs.find(blog => blog.id === match.params.id)
+    : null
 
   // user is logged in here
   return (
@@ -136,7 +113,8 @@ const App = () => {
       <div>
         <Link style={padding} to="/">blogs</Link>
 
-        <button onClick={handleLogout}>logout</button>
+        {user && <button onClick={handleLogout}>logout</button>}
+        {!user && <Link style={padding} to="/login">login</Link>}
       </div>
 
       <Routes>
@@ -152,9 +130,14 @@ const App = () => {
           />
         } />
 
-        {/* <Route path="/create" element={
-          <NoteForm createNote={addNote} />
-        } /> */}
+        <Route path="/blogs/:id" element={
+          <Blog
+            blog={blog}
+            user={user}
+            onDeleteBlog={() => handleDeleteBlog(blog)}
+            updateBlog={updateBlog}
+          />
+        } />
       </Routes>
     </div>
   )

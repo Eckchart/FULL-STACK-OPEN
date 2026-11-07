@@ -1,0 +1,9 @@
+PUT http://localhost:3003/api/blogs/6abc14f0d7c0e5cb016a2843
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjZhYWE5Nzg0ZDIxYTY4YzkxYmYzOTEyNiIsImlhdCI6MTc5NDA0MTU4NywiZXhwIjoxNzk0MDQ1MTg3fQ.t6xQ5L4Jz7oRkT1qpLBMw_kw3Ctz_bsnhdJ1QTxBDfQ
+Content-Type: application/json
+
+{
+    "title": "title3",
+    "author": "author3",
+    "url": "url3"
+}

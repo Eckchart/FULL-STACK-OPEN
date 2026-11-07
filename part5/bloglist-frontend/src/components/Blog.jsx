@@ -1,7 +1,13 @@
 import { useState } from 'react'
 
-const Blog = ({ blog, loggedInUser, updateBlog, onDeleteBlog }) => {
-  // const [showDetails, setShowDetails] = useState(false)
+// if `user` is null, that means they are not logged in,
+// otherwise `user` represents the currently logged-in user.
+const Blog = ({ blog, user, updateBlog, onDeleteBlog }) => {
+  const [showDetails, setShowDetails] = useState(false)
+
+  if (!blog) {
+    return null
+  }
 
   const blogStyle = {
     paddingTop: 10,
@@ -22,27 +28,27 @@ const Blog = ({ blog, loggedInUser, updateBlog, onDeleteBlog }) => {
         <span>{blog.title}</span>
         {' '}
         <span>{blog.author}</span>
-        {/* <button onClick={() => setShowDetails(!showDetails)}>
+        <button onClick={() => setShowDetails(!showDetails)}>
           {showDetails ? 'hide' : 'view'}
-        </button> */}
+        </button>
       </div>
 
-      {/* {showDetails &&
+      {showDetails &&
         <>
           <span>{blog.url}</span>
           <div>
             {blog.likes}
-            <button onClick={incrementLikes}>like</button>
+            {user && <button onClick={incrementLikes}>like</button>}
           </div>
           {blog.user.name}
 
-          {blog.user.username === loggedInUser.username &&
+          {user && blog.user.username === user.username &&
             <div>
               <button onClick={onDeleteBlog}>remove</button>
             </div>
           }
         </>
-      } */}
+      }
     </div>
   )
 }
