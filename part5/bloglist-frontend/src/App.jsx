@@ -5,6 +5,7 @@ import loginService from './services/login'
 import { Routes, Route, Link, useNavigate, useMatch } from 'react-router-dom'
 import BlogList from './components/BlogList'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -94,6 +95,7 @@ const App = () => {
       await blogService.destroy(blogToDelete.id)
       const newBlogs = blogs.filter(blog => blog.id !== blogToDelete.id)
       setBlogs(newBlogs)
+      navigate('/')
     } catch (error) {
       console.error('ERROR in blog deletion:', error.message)
     }
@@ -107,12 +109,12 @@ const App = () => {
     ? blogs.find(blog => blog.id === match.params.id)
     : null
 
-  // user is logged in here
   return (
     <div>
       <div>
         <Link style={padding} to="/">blogs</Link>
 
+        {user && <Link style={padding} to="/create">new blog</Link>}
         {user && <button onClick={handleLogout}>logout</button>}
         {!user && <Link style={padding} to="/login">login</Link>}
       </div>
@@ -138,6 +140,12 @@ const App = () => {
             updateBlog={updateBlog}
           />
         } />
+
+        {user &&
+          <Route path="/create" element={
+            <BlogForm addBlog={addBlog} />
+          } />
+        }
       </Routes>
     </div>
   )
