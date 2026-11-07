@@ -73,7 +73,7 @@ const App = () => {
   const addBlog = async (blog) => {
     try {
       const createdBlog = await blogService.create(blog)
-      createdBlog.user = user
+      createdBlog.user = user  // very important line
       changeNotificationState(`A new blog '${createdBlog.title}' by `
         + `'${createdBlog.author}' has been added`, 'success')
       setBlogs(blogs.concat(createdBlog))
