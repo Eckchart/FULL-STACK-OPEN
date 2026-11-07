@@ -8,9 +8,12 @@ import {
   Routes, Route, Link, useMatch
 } from 'react-router-dom'
 import Note from './components/Note'
+import { Container, AppBar, Toolbar, Button } from '@mui/material'
+import Notification from './components/Notification'
 
 const App = () => {
   const [notes, setNotes] = useState([])
+  const [notification, setNotification] = useState(null)
   const match = useMatch('/notes/:id')
 
   useEffect(() => {
@@ -39,7 +42,15 @@ const App = () => {
     noteService
       .create(noteObject)
       .then(returnedNote => {
+        // todo: fix this temp sol
+        const loggedUserJSON = window.localStorage.getItem('loggedNoteAppUser')
+        returnedNote.user = JSON.parse(loggedUserJSON)
         setNotes(notes.concat(returnedNote))
+
+        setNotification({ text: `Note ${returnedNote.content} added!`, type: 'success' })
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
       })
   }
 
@@ -58,30 +69,38 @@ const App = () => {
       .then(returnedNote => {
         setNotes(notes.map(note => note.id === id ? returnedNote : note))
       })
-      // .catch(() => {
-      //   setErrorMessage(`Note '${note.content}' was already removed from the server`)
-      //   setTimeout(() => {
-      //     setErrorMessage(null)
-      //   }, 5000)
-      //   setNotes(notes.filter(n => n.id !== id))
-      // })
-  }
-
-  const padding = {
-    padding: 5
+      .catch(() => {
+        setNotes(notes.filter(n => n.id !== id))
+        setNotification({
+          text: `Note '${note.content}' was already removed from the server`,
+          type: 'error'
+        })
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
+      })
   }
 
   const note = match
     ? notes.find(note => note.id === match.params.id)
     : null
+  const style = {
+    '&:hover': {
+      bgcolor: 'rgba(255, 255, 255, 0.3)'
+    }
+  }
 
   return (
-    <div>
-      <div>
-        <Link style={padding} to="/">home</Link>
-        <Link style={padding} to="/notes">notes</Link>
-        <Link style={padding} to="/create">new note</Link>
-      </div>
+    <Container>
+      <AppBar position="static">
+        <Toolbar>
+          <Button color="inherit" component={Link} to="/" sx={style}>home</Button>
+          <Button color="inherit" component={Link} to="/notes" sx={style}>notes</Button>
+          <Button color="inherit" component={Link} to="/create" sx={style}>new note</Button>
+        </Toolbar>
+      </AppBar>
+
+      <Notification notification={notification} />
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -104,7 +123,7 @@ const App = () => {
       </Routes>
 
       <Footer />
-    </div>
+    </Container>
   )
 }
 

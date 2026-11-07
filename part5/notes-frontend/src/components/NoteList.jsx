@@ -5,10 +5,13 @@ import loginService from '../services/login'
 import LoginForm from './LoginForm'
 import Togglable from './Togglable'
 import { Link } from 'react-router-dom'
+import {
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper
+} from '@mui/material'
 
 const NoteList = ({ notes }) => {
   const [showAll, setShowAll] = useState(true)
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -33,12 +36,12 @@ const NoteList = ({ notes }) => {
       )
       noteService.setToken(user.token)
       setUser(user)
-    } catch {
+    } catch {/*
       setErrorMessage('Wrong credentials!')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
-    }
+    */ }
   }
 
   const handleLogout = () => {
@@ -58,7 +61,6 @@ const NoteList = ({ notes }) => {
   return (
     <div>
       <h1>Notes</h1>
-      <Notification message={errorMessage} />
 
       {!user && loginForm()}
 
@@ -76,7 +78,35 @@ const NoteList = ({ notes }) => {
         </button>
       </div>
 
-      <ul>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>content</TableCell>
+              <TableCell>user</TableCell>
+              <TableCell>important</TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {notesToShow.map(note =>
+              <TableRow key={note.id}>
+                <TableCell>
+                  <Link to={`/notes/${note.id}`}>
+                    {note.content}
+                  </Link>
+                </TableCell>
+
+                {/* {console.log('note.user: ', note.user)} */}
+                <TableCell>{note.user.name}</TableCell>
+                <TableCell>{note.important ? 'yes' : 'no'}</TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* <ul>
         {notesToShow.map(note =>
           <li key={note.id}>
             <Link to={`/notes/${note.id}`}>
@@ -84,7 +114,7 @@ const NoteList = ({ notes }) => {
             </Link>
           </li>
         )}
-      </ul>
+      </ul> */}
     </div>
   )
 }
