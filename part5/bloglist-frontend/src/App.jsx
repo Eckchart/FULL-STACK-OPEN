@@ -87,7 +87,7 @@ const App = () => {
       const updatedBlog = await blogService.update(blog)
       updatedBlog.user = blog.user
       const newBlogs = blogs.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog)
-      changeNotificationState('Blog updated successfully', 'success')
+      // changeNotificationState('Blog updated successfully', 'success')
       setBlogs(newBlogs)
     } catch (error) {
       console.error('ERROR in blog update:', error.message)

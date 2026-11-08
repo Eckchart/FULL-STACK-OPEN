@@ -14,7 +14,7 @@ const BlogList = ({ blogs }) => {
           {blogsSortedByLikes.map(blog =>
             <li key={blog.id}>
               <Link to={`/blogs/${blog.id}`}>
-                {`${blog.title} ${blog.author}`}
+                {`${blog.title} by ${blog.author}`}
               </Link>
             </li>
           )}

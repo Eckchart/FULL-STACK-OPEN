@@ -1,20 +1,10 @@
-import { useState } from 'react'
+import { Stack, Typography, Paper, Link, Button } from '@mui/material'
 
 // if `user` is null, that means they are not logged in,
 // otherwise `user` represents the currently logged-in user.
 const Blog = ({ blog, user, updateBlog, onDeleteBlog }) => {
-  const [showDetails, setShowDetails] = useState(false)
-
   if (!blog) {
     return null
-  }
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
   }
 
   const incrementLikes = async () => {
@@ -22,34 +12,44 @@ const Blog = ({ blog, user, updateBlog, onDeleteBlog }) => {
     await updateBlog(newBlogObj)
   }
 
-  return (
-    <div style={blogStyle}>
-      <div>
-        <span>{blog.title}</span>
-        {' '}
-        <span>{blog.author}</span>
-        <button onClick={() => setShowDetails(!showDetails)}>
-          {showDetails ? 'hide' : 'view'}
-        </button>
-      </div>
+  const colorStyle = {
+    color: 'rgba(0, 0, 0, 0.6)'
+  }
+  const buttonStyle = {
+    width: 90,
+    fontWeight: 600
+  }
 
-      {showDetails &&
-        <>
-          <span>{blog.url}</span>
-          <div>
-            {blog.likes}
-            {user && <button onClick={incrementLikes}>like</button>}
-          </div>
-          {blog.user.name}
+  return (
+    <Paper elevation={3} sx={{ mt: 2, p: 2 }}>
+      <Stack spacing={2}>
+        <Typography variant="h5">{blog.title}</Typography>
+
+        <Typography sx={colorStyle}>by {blog.author}</Typography>
+
+        <Link href={blog.url}>{blog.url}</Link>
+
+        <Typography sx={colorStyle} variant="body2">
+          Added by {blog.user.name}
+        </Typography>
+
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Typography sx={{ mr: 1 }}>
+            {blog.likes} likes
+          </Typography>
+
+          <Button variant="outlined" onClick={incrementLikes} sx={buttonStyle}>
+            like
+          </Button>
 
           {user && blog.user.username === user.username &&
-            <div>
-              <button onClick={onDeleteBlog}>remove</button>
-            </div>
+            <Button variant="outlined" color="error" onClick={onDeleteBlog} sx={buttonStyle}>
+              remove
+            </Button>
           }
-        </>
-      }
-    </div>
+        </Stack>
+      </Stack>
+    </Paper>
   )
 }
 
