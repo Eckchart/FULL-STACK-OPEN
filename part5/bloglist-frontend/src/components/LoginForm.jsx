@@ -3,7 +3,7 @@ import { TextField, Button } from '@mui/material'
 const LoginForm = (props) => {
   return (
     <div>
-      <form onSubmit={props.onLoginSubmit}>
+      <form onSubmit={props.onLoginSubmit} style={{ marginTop: 10 }}>
         <TextField
           required
           type="text"

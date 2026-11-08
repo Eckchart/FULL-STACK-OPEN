@@ -7,6 +7,7 @@ import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
+import { Container, AppBar, Toolbar, Button, Box } from '@mui/material'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -40,14 +41,12 @@ const App = () => {
     try {
       const userObj = await loginService.login({ username, password })
 
-      // log out automatically after 1 hour, when token expires
-      setTimeout(handleLogout, 60 * 60 * 1000)
-
       window.localStorage.setItem('loggedInUser', JSON.stringify(userObj))
       setUser(userObj)
       // blogService.setToken(userObj.token)
       setUsername('')
       setPassword('')
+      changeNotificationState('Login successful', 'success')
       navigate('/')
     } catch (error) {
       console.error('ERROR when logging in:', error.message)
@@ -88,6 +87,7 @@ const App = () => {
       const updatedBlog = await blogService.update(blog)
       updatedBlog.user = blog.user
       const newBlogs = blogs.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog)
+      changeNotificationState('Blog updated successfully', 'success')
       setBlogs(newBlogs)
     } catch (error) {
       console.error('ERROR in blog update:', error.message)
@@ -103,6 +103,7 @@ const App = () => {
       await blogService.destroy(blogToDelete.id)
       const newBlogs = blogs.filter(blog => blog.id !== blogToDelete.id)
       setBlogs(newBlogs)
+      changeNotificationState('Blog deleted successfully', 'success')
       navigate('/')
     } catch (error) {
       console.error('ERROR in blog deletion:', error.message)
@@ -117,27 +118,46 @@ const App = () => {
     }, 5 * 1000)
   }
 
-  const padding = {
-    padding: 5
-  }
-
   const blog = match
     ? blogs.find(blog => blog.id === match.params.id)
     : null
+  const toolbarButtonStyle = {
+    '&:hover': {
+      // bgcolor = MUI shorthand for backgroundColor
+      bgcolor: '#1A2D3B'
+    }
+  }
 
   return (
-    <div>
-      <div>
-        <Link style={padding} to="/">blogs</Link>
+    <Container>
+      <AppBar position="static">
+        <Toolbar>
+          <h2>Blog App</h2>
 
-        {user &&
-          <>
-            <Link style={padding} to="/create">new blog</Link>
-            <button onClick={handleLogout}>logout</button>
-          </>
-        }
-        {!user && <Link style={padding} to="/login">login</Link>}
-      </div>
+          {/* Box is like div */}
+          <Box sx={{ ml: 'auto' }}>
+            <Button color="inherit" component={Link} to="/" sx={toolbarButtonStyle}>
+              blogs
+            </Button>
+
+            {user &&
+              <>
+                <Button color="inherit" component={Link} to="/create" sx={toolbarButtonStyle}>
+                  new blog
+                </Button>
+                <Button color="inherit" onClick={handleLogout} sx={toolbarButtonStyle}>
+                  logout
+                </Button>
+              </>
+            }
+            {!user &&
+              <Button color="inherit" component={Link} to="/login" sx={toolbarButtonStyle}>
+                login
+              </Button>
+            }
+          </Box>
+        </Toolbar>
+      </AppBar>
 
       <Notification
         message={notification.message}
@@ -172,7 +192,7 @@ const App = () => {
           } />
         }
       </Routes>
-    </div>
+    </Container>
   )
 }
 
