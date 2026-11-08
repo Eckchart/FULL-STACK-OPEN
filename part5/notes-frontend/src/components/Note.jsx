@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 const Note = ({ note, toggleImportance, deleteNote }) => {
   const id = useParams().id
   const navigate = useNavigate()
-  // const note = notes.find(note => note.id === id)
   const label = note.important ? 'make not important' : 'make important'
 
   const handleDelete = () => {

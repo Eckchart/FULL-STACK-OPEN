@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { TextField, Button, Stack } from '@mui/material'
 
 const BlogForm = ({ addBlog }) => {
   const [blog, setBlog] = useState({
@@ -25,38 +26,40 @@ const BlogForm = ({ addBlog }) => {
       <h2>create new</h2>
 
       <form onSubmit={handleBlogSubmit}>
-        <div>
-          <label>
-            title: &nbsp;
-            <input
-              type="text"
-              value={blog.title}
-              onChange={(e) => setBlog({ ...blog, title: e.target.value })}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            author: &nbsp;
-            <input
-              type="text"
-              value={blog.author}
-              onChange={(e) => setBlog({ ...blog, author: e.target.value })}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            url: &nbsp;
-            <input
-              type="text"
-              value={blog.url}
-              onChange={(e) => setBlog({ ...blog, url: e.target.value })}
-            />
-          </label>
-        </div>
+        <Stack spacing={2} sx={{ width: '400px', maxWidth: '100%' }}>
+          <TextField
+            required
+            type="text"
+            label="title"
+            placeholder="Enter title"
+            value={blog.title}
+            onChange={(e) => setBlog({ ...blog, title: e.target.value })}
+          />
 
-        <button type="submit">create</button>
+          <TextField
+            required
+            type="text"
+            label="author"
+            placeholder="Enter author"
+            value={blog.author}
+            onChange={(e) => setBlog({ ...blog, author: e.target.value })}
+          />
+
+          <TextField
+            required
+            type="text"
+            label="url"
+            placeholder="Enter url"
+            value={blog.url}
+            onChange={(e) => setBlog({ ...blog, url: e.target.value })}
+          />
+        </Stack>
+
+        <div>
+          <Button type="submit" variant="contained" style={{ marginTop: 10 }}>
+            create
+          </Button>
+        </div>
       </form>
     </div>
   )

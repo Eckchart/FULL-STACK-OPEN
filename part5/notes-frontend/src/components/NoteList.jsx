@@ -97,7 +97,6 @@ const NoteList = ({ notes }) => {
                   </Link>
                 </TableCell>
 
-                {/* {console.log('note.user: ', note.user)} */}
                 <TableCell>{note.user.name}</TableCell>
                 <TableCell>{note.important ? 'yes' : 'no'}</TableCell>
               </TableRow>
@@ -105,16 +104,6 @@ const NoteList = ({ notes }) => {
           </TableBody>
         </Table>
       </TableContainer>
-
-      {/* <ul>
-        {notesToShow.map(note =>
-          <li key={note.id}>
-            <Link to={`/notes/${note.id}`}>
-              {note.content}
-            </Link>
-          </li>
-        )}
-      </ul> */}
     </div>
   )
 }
