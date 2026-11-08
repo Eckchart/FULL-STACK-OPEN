@@ -27,7 +27,7 @@ const Blog = ({ blog, user, updateBlog, onDeleteBlog }) => {
 
         <Typography sx={colorStyle}>by {blog.author}</Typography>
 
-        <Link href={blog.url}>{blog.url}</Link>
+        <Link href={blog.url} target="_blank" rel="noreferrer">{blog.url}</Link>
 
         <Typography sx={colorStyle} variant="body2">
           Added by {blog.user.name}
