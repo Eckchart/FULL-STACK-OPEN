@@ -1,8 +1,13 @@
-import { Stack, Typography, Paper, Link, Button } from '@mui/material'
+import { useState } from 'react'
+import {
+  Stack, Typography, Paper, Link, Button, Dialog, DialogTitle,
+  DialogContent, DialogContentText, DialogActions
+} from '@mui/material'
 
 // if `user` is null, that means they are not logged in,
 // otherwise `user` represents the currently logged-in user.
 const Blog = ({ blog, user, updateBlog, onDeleteBlog }) => {
+  const [openDialog, setOpenDialog] = useState(false)
   if (!blog) {
     return null
   }
@@ -12,6 +17,16 @@ const Blog = ({ blog, user, updateBlog, onDeleteBlog }) => {
     await updateBlog(newBlogObj)
   }
 
+  const handleDelete = () => {
+    onDeleteBlog()
+    setOpenDialog(false)
+  }
+
+  const hoverStyle = {
+    '&:hover': {
+      bgcolor: 'rgba(0, 0, 0, 0.1)'
+    }
+  }
   const colorStyle = {
     color: 'rgba(0, 0, 0, 0.6)'
   }
@@ -27,7 +42,10 @@ const Blog = ({ blog, user, updateBlog, onDeleteBlog }) => {
 
         <Typography sx={colorStyle}>by {blog.author}</Typography>
 
-        <Link href={blog.url} target="_blank" rel="noreferrer">{blog.url}</Link>
+        {/* noreferrer includes noopener behavior in modern browsers;
+          * using noopener for compatibility with older browsers.
+          */}
+        <Link href={blog.url} target="_blank" rel="noopener noreferrer">{blog.url}</Link>
 
         <Typography sx={colorStyle} variant="body2">
           Added by {blog.user.name}
@@ -38,17 +56,34 @@ const Blog = ({ blog, user, updateBlog, onDeleteBlog }) => {
             {blog.likes} likes
           </Typography>
 
-          <Button variant="outlined" onClick={incrementLikes} sx={buttonStyle}>
-            like
-          </Button>
+          {user &&
+            <Button variant="outlined" onClick={incrementLikes} sx={buttonStyle}>
+              like
+            </Button>
+          }
 
           {user && blog.user.username === user.username &&
-            <Button variant="outlined" color="error" onClick={onDeleteBlog} sx={buttonStyle}>
+            <Button variant="outlined" color="error" onClick={() => setOpenDialog(true)} sx={buttonStyle}>
               remove
             </Button>
           }
         </Stack>
       </Stack>
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Remove blog</DialogTitle>
+
+        <DialogContent>
+          <DialogContentText>
+            Remove blog <strong>{blog.title}</strong> by {blog.author}?
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} sx={hoverStyle}>cancel</Button>
+          <Button color="error" variant="contained" onClick={handleDelete}>remove</Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   )
 }

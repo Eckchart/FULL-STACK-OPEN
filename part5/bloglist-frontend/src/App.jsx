@@ -96,9 +96,6 @@ const App = () => {
   }
 
   const handleDeleteBlog = async (blogToDelete) => {
-    if (!window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}`)) {
-      return
-    }
     try {
       await blogService.destroy(blogToDelete.id)
       const newBlogs = blogs.filter(blog => blog.id !== blogToDelete.id)

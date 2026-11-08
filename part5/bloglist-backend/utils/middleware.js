@@ -20,7 +20,7 @@ const tokenExtractor = (req, res, next) => {
 
 const userExtractor = async (req, res, next) => {
   // Maybe careful with this in the future!!
-  // todo: careful with this; now any put request
+  // todo: careful with this; now any PUT request
   // requires that a user be logged in (and has a token)
   if (req.method === 'GET' /*|| req.method === 'PUT'*/) {
     next()
