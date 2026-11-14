@@ -83,8 +83,8 @@ describe('useNotes filtering', () => {
     expect(result.current).toEqual([notes[0]])
   })
 
-  it('filters nonimportant notes', () => {
-    useNoteStore.setState({ notes, filter: 'nonimportant' })
+  it('filters unimportant notes', () => {
+    useNoteStore.setState({ notes, filter: 'unimportant' })
     const { result } = renderHook(() => useNotes())
     expect(result.current).toEqual([notes[1]])
   })
