@@ -3,12 +3,10 @@ import { useNoteActions } from '../store'
 const NoteForm = () => {
   const { add } = useNoteActions()
 
-  const generateId = () => Number((Math.random() * 1000000).toFixed(0))
-
   const addNote = (e) => {    
     e.preventDefault()    
-    const content = e.target.note.value    
-    add({ id: generateId(), content, important: false })    
+    const content = e.target.note.value
+    add(content)    
     e.target.reset()  
   }
 
